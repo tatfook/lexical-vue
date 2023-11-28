@@ -3,7 +3,11 @@ module.exports = function (babel) {
 
     return {
         visitor: {
-            ImportDeclaration(path) {
+            ImportDeclaration(path) {// 检查导入的源是否包含 "lexical"
+                if (!path.node.source.value.includes('lexical')) {
+                    return;
+                }
+
                 // 检查是否存在命名导入
                 let hasNamedImports = path.node.specifiers.some(specifier => t.isImportSpecifier(specifier));
 
