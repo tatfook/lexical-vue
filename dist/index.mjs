@@ -1,24 +1,23 @@
-// src/composables/useAutoLink.ts
-import { unref } from "vue";
-import {
-  $createAutoLinkNode,
-  $isAutoLinkNode,
-  $isLinkNode,
-  AutoLinkNode
-} from "@lexical/link";
-import { mergeRegister } from "@lexical/utils";
-import {
-  $createTextNode,
-  $isElementNode,
-  $isLineBreakNode,
-  $isTextNode,
-  TextNode
-} from "lexical";
-
+import _defaultImport from "vue"; // src/composables/useAutoLink.ts
+const unref = _defaultImport.unref;
+import _defaultImport2 from "@lexical/link";
+const AutoLinkNode = _defaultImport2.AutoLinkNode;
+const $isLinkNode = _defaultImport2.$isLinkNode;
+const $isAutoLinkNode = _defaultImport2.$isAutoLinkNode;
+const $createAutoLinkNode = _defaultImport2.$createAutoLinkNode;
+import _defaultImport3 from "@lexical/utils";
+const mergeRegister = _defaultImport3.mergeRegister;
+import _defaultImport4 from "lexical";
 // src/composables/useEffect.ts
-import { watchEffect } from "vue";
+const TextNode = _defaultImport4.TextNode;
+const $isTextNode = _defaultImport4.$isTextNode;
+const $isLineBreakNode = _defaultImport4.$isLineBreakNode;
+const $isElementNode = _defaultImport4.$isElementNode;
+const $createTextNode = _defaultImport4.$createTextNode;
+import _defaultImport5 from "vue";
+const watchEffect = _defaultImport5.watchEffect;
 function useEffect(cb, options) {
-  watchEffect((onInvalidate) => {
+  watchEffect(onInvalidate => {
     const unregister = cb();
     onInvalidate(() => unregister?.());
   }, {
@@ -31,8 +30,7 @@ function useEffect(cb, options) {
 function findFirstMatch(text, matchers) {
   for (let i = 0; i < matchers.length; i++) {
     const match = matchers[i](text);
-    if (match)
-      return match;
+    if (match) return match;
   }
   return null;
 }
@@ -48,20 +46,17 @@ function startsWithSeparator(textContent) {
 }
 function isPreviousNodeValid(node) {
   let previousNode = node.getPreviousSibling();
-  if ($isElementNode(previousNode))
-    previousNode = previousNode.getLastDescendant();
+  if ($isElementNode(previousNode)) previousNode = previousNode.getLastDescendant();
   return previousNode === null || $isLineBreakNode(previousNode) || $isTextNode(previousNode) && endsWithSeparator(previousNode.getTextContent());
 }
 function isNextNodeValid(node) {
   let nextNode = node.getNextSibling();
-  if ($isElementNode(nextNode))
-    nextNode = nextNode.getFirstDescendant();
+  if ($isElementNode(nextNode)) nextNode = nextNode.getFirstDescendant();
   return nextNode === null || $isLineBreakNode(nextNode) || $isTextNode(nextNode) && startsWithSeparator(nextNode.getTextContent());
 }
 function isContentAroundIsValid(matchStart, matchEnd, text, node) {
   const contentBeforeIsValid = matchStart > 0 ? isSeparator(text[matchStart - 1]) : isPreviousNodeValid(node);
-  if (!contentBeforeIsValid)
-    return false;
+  if (!contentBeforeIsValid) return false;
   const contentAfterIsValid = matchEnd < text.length ? isSeparator(text[matchEnd]) : isNextNodeValid(node);
   return contentAfterIsValid;
 }
@@ -75,23 +70,13 @@ function handleLinkCreation(node, matchers, onChange) {
     const matchStart = match.index;
     const matchLength = match.length;
     const matchEnd = matchStart + matchLength;
-    const isValid = isContentAroundIsValid(
-      invalidMatchEnd + matchStart,
-      invalidMatchEnd + matchEnd,
-      nodeText,
-      node
-    );
+    const isValid = isContentAroundIsValid(invalidMatchEnd + matchStart, invalidMatchEnd + matchEnd, nodeText, node);
     if (isValid) {
       let linkTextNode;
       if (invalidMatchEnd + matchStart === 0) {
-        [linkTextNode, remainingTextNode] = remainingTextNode.splitText(
-          invalidMatchEnd + matchLength
-        );
+        [linkTextNode, remainingTextNode] = remainingTextNode.splitText(invalidMatchEnd + matchLength);
       } else {
-        [, linkTextNode, remainingTextNode] = remainingTextNode.splitText(
-          invalidMatchEnd + matchStart,
-          invalidMatchEnd + matchStart + matchLength
-        );
+        [, linkTextNode, remainingTextNode] = remainingTextNode.splitText(invalidMatchEnd + matchStart, invalidMatchEnd + matchStart + matchLength);
       }
       const linkNode = $createAutoLinkNode(match.url, match.attributes);
       const textNode = $createTextNode(match.text);
@@ -164,47 +149,44 @@ function handleBadNeighbors(textNode, onChange) {
 function replaceWithChildren(node) {
   const children = node.getChildren();
   const childrenLength = children.length;
-  for (let j = childrenLength - 1; j >= 0; j--)
-    node.insertAfter(children[j]);
+  for (let j = childrenLength - 1; j >= 0; j--) node.insertAfter(children[j]);
   node.remove();
-  return children.map((child) => child.getLatest());
+  return children.map(child => child.getLatest());
 }
 function useAutoLink(editor, matchers, onChange) {
   useEffect(() => {
     if (!editor.hasNodes([AutoLinkNode])) {
-      throw new Error(
-        "LexicalAutoLinkPlugin: AutoLinkNode not registered on editor"
-      );
+      throw new Error("LexicalAutoLinkPlugin: AutoLinkNode not registered on editor");
     }
     const onChangeWrapped = (url, prevUrl) => {
-      if (onChange)
-        onChange(url, prevUrl);
+      if (onChange) onChange(url, prevUrl);
     };
-    return mergeRegister(
-      editor.registerNodeTransform(TextNode, (textNode) => {
-        const parent = textNode.getParentOrThrow();
-        if ($isAutoLinkNode(parent)) {
-          handleLinkEdit(parent, unref(matchers), onChangeWrapped);
-        } else if (!$isLinkNode(parent)) {
-          if (textNode.isSimpleText())
-            handleLinkCreation(textNode, unref(matchers), onChangeWrapped);
-          handleBadNeighbors(textNode, onChangeWrapped);
-        }
-      }),
-      editor.registerNodeTransform(AutoLinkNode, (linkNode) => {
-        handleLinkEdit(linkNode, unref(matchers), onChangeWrapped);
-      })
-    );
+    return mergeRegister(editor.registerNodeTransform(TextNode, textNode => {
+      const parent = textNode.getParentOrThrow();
+      if ($isAutoLinkNode(parent)) {
+        handleLinkEdit(parent, unref(matchers), onChangeWrapped);
+      } else if (!$isLinkNode(parent)) {
+        if (textNode.isSimpleText()) handleLinkCreation(textNode, unref(matchers), onChangeWrapped);
+        handleBadNeighbors(textNode, onChangeWrapped);
+      }
+    }), editor.registerNodeTransform(AutoLinkNode, linkNode => {
+      handleLinkEdit(linkNode, unref(matchers), onChangeWrapped);
+    }));
   });
 }
 
 // src/composables/useCanShowPlaceholder.ts
-import { readonly, ref } from "vue";
-import { $canShowPlaceholderCurry } from "@lexical/text";
-import { mergeRegister as mergeRegister2 } from "@lexical/utils";
-
+import _defaultImport6 from "vue";
+const ref = _defaultImport6.ref;
+const readonly = _defaultImport6.readonly;
+import _defaultImport7 from "@lexical/text";
+const $canShowPlaceholderCurry = _defaultImport7.$canShowPlaceholderCurry;
+import _defaultImport8 from "@lexical/utils";
 // src/composables/useMounted.ts
-import { onMounted, onUnmounted } from "vue";
+const mergeRegister2 = _defaultImport8.mergeRegister;
+import _defaultImport9 from "vue";
+const onUnmounted = _defaultImport9.onUnmounted;
+const onMounted = _defaultImport9.onMounted;
 function useMounted(cb) {
   let unregister;
   onMounted(() => {
@@ -228,75 +210,65 @@ function useCanShowPlaceholder(editor) {
     canShowPlaceholder.value = currentCanShowPlaceholder;
   }
   useMounted(() => {
-    return mergeRegister2(
-      editor.registerUpdateListener(() => {
-        resetCanShowPlaceholder();
-      }),
-      editor.registerEditableListener(() => {
-        resetCanShowPlaceholder();
-      })
-    );
+    return mergeRegister2(editor.registerUpdateListener(() => {
+      resetCanShowPlaceholder();
+    }), editor.registerEditableListener(() => {
+      resetCanShowPlaceholder();
+    }));
   });
   return readonly(canShowPlaceholder);
 }
 
 // src/composables/useCharacterLimit.ts
-import {
-  $createOverflowNode,
-  $isOverflowNode,
-  OverflowNode
-} from "@lexical/overflow";
-import { $rootTextContent } from "@lexical/text";
-import { $dfs, mergeRegister as mergeRegister3 } from "@lexical/utils";
-import {
-  $getSelection,
-  $isLeafNode,
-  $isRangeSelection,
-  $isTextNode as $isTextNode2,
-  $setSelection
-} from "lexical";
+import _defaultImport10 from "@lexical/overflow";
+const OverflowNode = _defaultImport10.OverflowNode;
+const $isOverflowNode = _defaultImport10.$isOverflowNode;
+const $createOverflowNode = _defaultImport10.$createOverflowNode;
+import _defaultImport11 from "@lexical/text";
+const $rootTextContent = _defaultImport11.$rootTextContent;
+import _defaultImport12 from "@lexical/utils";
+const mergeRegister3 = _defaultImport12.mergeRegister;
+const $dfs = _defaultImport12.$dfs;
+import _defaultImport13 from "lexical";
+const $setSelection = _defaultImport13.$setSelection;
+const $isTextNode2 = _defaultImport13.$isTextNode;
+const $isRangeSelection = _defaultImport13.$isRangeSelection;
+const $isLeafNode = _defaultImport13.$isLeafNode;
+const $getSelection = _defaultImport13.$getSelection;
 function useCharacterLimit(editor, maxCharacters, optional = Object.freeze({})) {
   const {
-    strlen = (input) => input.length,
+    strlen = input => input.length,
     // UTF-16
-    remainingCharacters = (_characters) => {
-    }
+    remainingCharacters = _characters => {}
   } = optional;
   useMounted(() => {
     if (!editor.hasNodes([OverflowNode])) {
-      throw new Error(
-        "useCharacterLimit: OverflowNode not registered on editor"
-      );
+      throw new Error("useCharacterLimit: OverflowNode not registered on editor");
     }
     let text = editor.getEditorState().read($rootTextContent);
     let lastComputedTextLength = 0;
-    return mergeRegister3(
-      editor.registerTextContentListener((currentText) => {
-        text = currentText;
-      }),
-      editor.registerUpdateListener(({ dirtyLeaves }) => {
-        const isComposing = editor.isComposing();
-        const hasDirtyLeaves = dirtyLeaves.size > 0;
-        if (isComposing || !hasDirtyLeaves)
-          return;
-        const textLength = strlen(text);
-        const textLengthAboveThreshold = textLength > maxCharacters || lastComputedTextLength !== null && lastComputedTextLength > maxCharacters;
-        const diff = maxCharacters - textLength;
-        remainingCharacters(diff);
-        if (lastComputedTextLength === null || textLengthAboveThreshold) {
-          const offset = findOffset(text, maxCharacters, strlen);
-          editor.update(
-            () => {
-              $wrapOverflowedNodes(offset);
-            },
-            {
-              tag: "history-merge"
-            }
-          );
-        }
-        lastComputedTextLength = textLength;
-      })
-    );
+    return mergeRegister3(editor.registerTextContentListener(currentText => {
+      text = currentText;
+    }), editor.registerUpdateListener(({
+      dirtyLeaves
+    }) => {
+      const isComposing = editor.isComposing();
+      const hasDirtyLeaves = dirtyLeaves.size > 0;
+      if (isComposing || !hasDirtyLeaves) return;
+      const textLength = strlen(text);
+      const textLengthAboveThreshold = textLength > maxCharacters || lastComputedTextLength !== null && lastComputedTextLength > maxCharacters;
+      const diff = maxCharacters - textLength;
+      remainingCharacters(diff);
+      if (lastComputedTextLength === null || textLengthAboveThreshold) {
+        const offset = findOffset(text, maxCharacters, strlen);
+        editor.update(() => {
+          $wrapOverflowedNodes(offset);
+        }, {
+          tag: "history-merge"
+        });
+      }
+      lastComputedTextLength = textLength;
+    }));
   });
 }
 function findOffset(text, maxCharacters, strlen) {
@@ -306,10 +278,11 @@ function findOffset(text, maxCharacters, strlen) {
   if (typeof Segmenter === "function") {
     const segmenter = new Segmenter();
     const graphemes = segmenter.segment(text);
-    for (const { segment: grapheme } of graphemes) {
+    for (const {
+      segment: grapheme
+    } of graphemes) {
       const nextOffset = offset + strlen(grapheme);
-      if (nextOffset > maxCharacters)
-        break;
+      if (nextOffset > maxCharacters) break;
       offset = nextOffset;
       offsetUtf16 += grapheme.length;
     }
@@ -319,8 +292,7 @@ function findOffset(text, maxCharacters, strlen) {
     for (let i = 0; i < codepointsLength; i++) {
       const codepoint = codepoints[i];
       const nextOffset = offset + strlen(codepoint);
-      if (nextOffset > maxCharacters)
-        break;
+      if (nextOffset > maxCharacters) break;
       offset = nextOffset;
       offsetUtf16 += codepoint.length;
     }
@@ -332,7 +304,9 @@ function $wrapOverflowedNodes(offset) {
   const dfsNodesLength = dfsNodes.length;
   let accumulatedLength = 0;
   for (let i = 0; i < dfsNodesLength; i += 1) {
-    const { node } = dfsNodes[i];
+    const {
+      node
+    } = dfsNodes[i];
     if ($isOverflowNode(node)) {
       const previousLength = accumulatedLength;
       const nextLength = accumulatedLength + node.getTextContentSize();
@@ -343,12 +317,7 @@ function $wrapOverflowedNodes(offset) {
         $unwrapNode(node);
         const selection = $getSelection();
         if ($isRangeSelection(selection) && (!selection.anchor.getNode().isAttached() || !selection.focus.getNode().isAttached())) {
-          if ($isTextNode2(previousSibling))
-            previousSibling.select();
-          else if ($isTextNode2(nextSibling))
-            nextSibling.select();
-          else if (parent !== null)
-            parent.select();
+          if ($isTextNode2(previousSibling)) previousSibling.select();else if ($isTextNode2(nextSibling)) nextSibling.select();else if (parent !== null) parent.select();
         }
       } else if (previousLength < offset) {
         const descendant = node.getFirstDescendant();
@@ -356,8 +325,7 @@ function $wrapOverflowedNodes(offset) {
         const previousPlusDescendantLength = previousLength + descendantLength;
         const firstDescendantIsSimpleText = $isTextNode2(descendant) && descendant.isSimpleText();
         const firstDescendantDoesNotOverflow = previousPlusDescendantLength <= offset;
-        if (firstDescendantIsSimpleText || firstDescendantDoesNotOverflow)
-          $unwrapNode(node);
+        if (firstDescendantIsSimpleText || firstDescendantDoesNotOverflow) $unwrapNode(node);
       }
     } else if ($isLeafNode(node)) {
       const previousAccumulatedLength = accumulatedLength;
@@ -366,15 +334,12 @@ function $wrapOverflowedNodes(offset) {
         const previousSelection = $getSelection();
         let overflowNode;
         if (previousAccumulatedLength < offset && $isTextNode2(node) && node.isSimpleText()) {
-          const [, overflowedText] = node.splitText(
-            offset - previousAccumulatedLength
-          );
+          const [, overflowedText] = node.splitText(offset - previousAccumulatedLength);
           overflowNode = $wrapNode(overflowedText);
         } else {
           overflowNode = $wrapNode(node);
         }
-        if (previousSelection !== null)
-          $setSelection(previousSelection);
+        if (previousSelection !== null) $setSelection(previousSelection);
         mergePrevious(overflowNode);
       }
     }
@@ -389,23 +354,20 @@ function $wrapNode(node) {
 function $unwrapNode(node) {
   const children = node.getChildren();
   const childrenLength = children.length;
-  for (let i = 0; i < childrenLength; i++)
-    node.insertBefore(children[i]);
+  for (let i = 0; i < childrenLength; i++) node.insertBefore(children[i]);
   node.remove();
   return childrenLength > 0 ? children[childrenLength - 1] : null;
 }
 function mergePrevious(overflowNode) {
   const previousNode = overflowNode.getPreviousSibling();
-  if (!$isOverflowNode(previousNode))
-    return;
+  if (!$isOverflowNode(previousNode)) return;
   const firstChild = overflowNode.getFirstChild();
   const previousNodeChildren = previousNode.getChildren();
   const previousNodeChildrenLength = previousNodeChildren.length;
   if (firstChild === null) {
     overflowNode.append(...previousNodeChildren);
   } else {
-    for (let i = 0; i < previousNodeChildrenLength; i++)
-      firstChild.insertBefore(previousNodeChildren[i]);
+    for (let i = 0; i < previousNodeChildrenLength; i++) firstChild.insertBefore(previousNodeChildren[i]);
   }
   const selection = $getSelection();
   if ($isRangeSelection(selection)) {
@@ -416,31 +378,28 @@ function mergePrevious(overflowNode) {
     if (anchorNode.is(previousNode)) {
       anchor.set(overflowNode.getKey(), anchor.offset, "element");
     } else if (anchorNode.is(overflowNode)) {
-      anchor.set(
-        overflowNode.getKey(),
-        previousNodeChildrenLength + anchor.offset,
-        "element"
-      );
+      anchor.set(overflowNode.getKey(), previousNodeChildrenLength + anchor.offset, "element");
     }
     if (focusNode.is(previousNode)) {
       focus.set(overflowNode.getKey(), focus.offset, "element");
     } else if (focusNode.is(overflowNode)) {
-      focus.set(
-        overflowNode.getKey(),
-        previousNodeChildrenLength + focus.offset,
-        "element"
-      );
+      focus.set(overflowNode.getKey(), previousNodeChildrenLength + focus.offset, "element");
     }
   }
   previousNode?.remove();
 }
 
 // src/composables/useDecorators.ts
-import { Teleport, computed, h, ref as ref2, unref as unref2 } from "vue";
+import _defaultImport14 from "vue";
+const unref2 = _defaultImport14.unref;
+const ref2 = _defaultImport14.ref;
+const h = _defaultImport14.h;
+const computed = _defaultImport14.computed;
+const Teleport = _defaultImport14.Teleport;
 function useDecorators(editor) {
   const decorators = ref2(editor.getDecorators());
   useMounted(() => {
-    return editor.registerDecoratorListener((nextDecorators) => {
+    return editor.registerDecoratorListener(nextDecorators => {
       decorators.value = nextDecorators;
     });
   });
@@ -452,11 +411,9 @@ function useDecorators(editor) {
       const vueDecorator = decorators.value[nodeKey];
       const element = editor.getElementByKey(nodeKey);
       if (element !== null) {
-        decoratedTeleports.push(
-          h(Teleport, {
-            to: element
-          }, vueDecorator)
-        );
+        decoratedTeleports.push(h(Teleport, {
+          to: element
+        }, vueDecorator));
       }
     }
     return decoratedTeleports;
@@ -464,27 +421,29 @@ function useDecorators(editor) {
 }
 
 // src/composables/useEditor.ts
-import { inject } from "vue";
-
+import _defaultImport15 from "vue";
 // src/composables/inject.ts
+const inject = _defaultImport15.inject;
 var editorKey = Symbol("Lexical editor");
 
 // src/composables/useEditor.ts
 function useEditor() {
   const editor = inject(editorKey);
-  if (!editor)
-    throw new Error("<LexicalComposer /> is required");
+  if (!editor) throw new Error("<LexicalComposer /> is required");
   return editor;
 }
 
 // src/composables/useHistory.ts
-import { computed as computed2, unref as unref3, watchPostEffect } from "vue";
-import { createEmptyHistoryState, registerHistory } from "@lexical/history";
+import _defaultImport16 from "vue";
+const watchPostEffect = _defaultImport16.watchPostEffect;
+const unref3 = _defaultImport16.unref;
+const computed2 = _defaultImport16.computed;
+import _defaultImport17 from "@lexical/history";
+const registerHistory = _defaultImport17.registerHistory;
+const createEmptyHistoryState = _defaultImport17.createEmptyHistoryState;
 function useHistory(editor, externalHistoryState, delay) {
-  const historyState = computed2(
-    () => unref3(externalHistoryState) || createEmptyHistoryState()
-  );
-  watchPostEffect((onInvalidate) => {
+  const historyState = computed2(() => unref3(externalHistoryState) || createEmptyHistoryState());
+  watchPostEffect(onInvalidate => {
     const unregisterListener = registerHistory(unref3(editor), historyState.value, unref3(delay) || 1e3);
     onInvalidate(() => {
       unregisterListener();
@@ -493,44 +452,47 @@ function useHistory(editor, externalHistoryState, delay) {
 }
 
 // src/composables/useLexicalIsTextContentEmpty.ts
-import { readonly as readonly2, ref as ref3 } from "vue";
-import { $isRootTextContentEmptyCurry } from "@lexical/text";
+import _defaultImport18 from "vue";
+const ref3 = _defaultImport18.ref;
+const readonly2 = _defaultImport18.readonly;
+import _defaultImport19 from "@lexical/text";
+const $isRootTextContentEmptyCurry = _defaultImport19.$isRootTextContentEmptyCurry;
 function useLexicalIsTextContentEmpty(editor, trim) {
-  const isEmpty = ref3(
-    editor.getEditorState().read($isRootTextContentEmptyCurry(editor.isComposing(), trim))
-  );
+  const isEmpty = ref3(editor.getEditorState().read($isRootTextContentEmptyCurry(editor.isComposing(), trim)));
   useMounted(() => {
-    return editor.registerUpdateListener(({ editorState }) => {
+    return editor.registerUpdateListener(({
+      editorState
+    }) => {
       const isComposing = editor.isComposing();
-      isEmpty.value = editorState.read(
-        $isRootTextContentEmptyCurry(isComposing, trim)
-      );
+      isEmpty.value = editorState.read($isRootTextContentEmptyCurry(isComposing, trim));
     });
   });
   return readonly2(isEmpty);
 }
 
 // src/composables/useLexicalNodeSelection.ts
-import {
-  $createNodeSelection,
-  $getNodeByKey,
-  $getSelection as $getSelection2,
-  $isNodeSelection,
-  $setSelection as $setSelection2
-} from "lexical";
-import { readonly as readonly3, ref as ref4, unref as unref4, watchPostEffect as watchPostEffect2 } from "vue";
+import _defaultImport20 from "lexical";
+const $setSelection2 = _defaultImport20.$setSelection;
+const $isNodeSelection = _defaultImport20.$isNodeSelection;
+const $getSelection2 = _defaultImport20.$getSelection;
+const $getNodeByKey = _defaultImport20.$getNodeByKey;
+const $createNodeSelection = _defaultImport20.$createNodeSelection;
+import _defaultImport21 from "vue";
+const watchPostEffect2 = _defaultImport21.watchPostEffect;
+const unref4 = _defaultImport21.unref;
+const ref4 = _defaultImport21.ref;
+const readonly3 = _defaultImport21.readonly;
 function isNodeSelected(editor, key) {
   return editor.getEditorState().read(() => {
     const node = $getNodeByKey(key);
-    if (node === null)
-      return false;
+    if (node === null) return false;
     return node.isSelected();
   });
 }
 function useLexicalNodeSelection(key) {
   const editor = useEditor();
   const isSelected = ref4(isNodeSelected(editor, unref4(key)));
-  watchPostEffect2((onInvalidate) => {
+  watchPostEffect2(onInvalidate => {
     const unregisterListener = editor.registerUpdateListener(() => {
       isSelected.value = isNodeSelected(editor, unref4(key));
     });
@@ -538,7 +500,7 @@ function useLexicalNodeSelection(key) {
       unregisterListener();
     });
   });
-  const setSelected = (selected) => {
+  const setSelected = selected => {
     editor.update(() => {
       let selection = $getSelection2();
       const realKeyVal = unref4(key);
@@ -546,17 +508,13 @@ function useLexicalNodeSelection(key) {
         selection = $createNodeSelection();
         $setSelection2(selection);
       }
-      if (selected)
-        selection.add(realKeyVal);
-      else
-        selection.delete(realKeyVal);
+      if (selected) selection.add(realKeyVal);else selection.delete(realKeyVal);
     });
   };
   const clearSelection = () => {
     editor.update(() => {
       const selection = $getSelection2();
-      if ($isNodeSelection(selection))
-        selection.clear();
+      if ($isNodeSelection(selection)) selection.clear();
     });
   };
   return {
@@ -567,121 +525,99 @@ function useLexicalNodeSelection(key) {
 }
 
 // src/composables/useLexicalTextEntity.ts
-import { registerLexicalTextEntity } from "@lexical/text";
-import { mergeRegister as mergeRegister4 } from "@lexical/utils";
+import _defaultImport22 from "@lexical/text";
+const registerLexicalTextEntity = _defaultImport22.registerLexicalTextEntity;
+import _defaultImport23 from "@lexical/utils";
+const mergeRegister4 = _defaultImport23.mergeRegister;
 function useLexicalTextEntity(getMatch, targetNode, createNode) {
   const editor = useEditor();
   useMounted(() => {
-    return mergeRegister4(
-      ...registerLexicalTextEntity(editor, getMatch, targetNode, createNode)
-    );
+    return mergeRegister4(...registerLexicalTextEntity(editor, getMatch, targetNode, createNode));
   });
 }
 
 // src/composables/useList.ts
-import {
-  $handleListInsertParagraph,
-  INSERT_ORDERED_LIST_COMMAND,
-  INSERT_UNORDERED_LIST_COMMAND,
-  REMOVE_LIST_COMMAND,
-  insertList,
-  removeList
-} from "@lexical/list";
-import { mergeRegister as mergeRegister5 } from "@lexical/utils";
-import {
-  COMMAND_PRIORITY_LOW,
-  INSERT_PARAGRAPH_COMMAND
-} from "lexical";
+import _defaultImport24 from "@lexical/list";
+const removeList = _defaultImport24.removeList;
+const insertList = _defaultImport24.insertList;
+const REMOVE_LIST_COMMAND = _defaultImport24.REMOVE_LIST_COMMAND;
+const INSERT_UNORDERED_LIST_COMMAND = _defaultImport24.INSERT_UNORDERED_LIST_COMMAND;
+const INSERT_ORDERED_LIST_COMMAND = _defaultImport24.INSERT_ORDERED_LIST_COMMAND;
+const $handleListInsertParagraph = _defaultImport24.$handleListInsertParagraph;
+import _defaultImport25 from "@lexical/utils";
+const mergeRegister5 = _defaultImport25.mergeRegister;
+import _defaultImport26 from "lexical";
+const INSERT_PARAGRAPH_COMMAND = _defaultImport26.INSERT_PARAGRAPH_COMMAND;
+const COMMAND_PRIORITY_LOW = _defaultImport26.COMMAND_PRIORITY_LOW;
 function useList(editor) {
   useMounted(() => {
-    return mergeRegister5(
-      editor.registerCommand(
-        INSERT_ORDERED_LIST_COMMAND,
-        () => {
-          insertList(editor, "number");
-          return true;
-        },
-        COMMAND_PRIORITY_LOW
-      ),
-      editor.registerCommand(
-        INSERT_UNORDERED_LIST_COMMAND,
-        () => {
-          insertList(editor, "bullet");
-          return true;
-        },
-        COMMAND_PRIORITY_LOW
-      ),
-      editor.registerCommand(
-        REMOVE_LIST_COMMAND,
-        () => {
-          removeList(editor);
-          return true;
-        },
-        COMMAND_PRIORITY_LOW
-      ),
-      editor.registerCommand(
-        INSERT_PARAGRAPH_COMMAND,
-        () => {
-          const hasHandledInsertParagraph = $handleListInsertParagraph();
-          if (hasHandledInsertParagraph)
-            return true;
-          return false;
-        },
-        COMMAND_PRIORITY_LOW
-      )
-    );
+    return mergeRegister5(editor.registerCommand(INSERT_ORDERED_LIST_COMMAND, () => {
+      insertList(editor, "number");
+      return true;
+    }, COMMAND_PRIORITY_LOW), editor.registerCommand(INSERT_UNORDERED_LIST_COMMAND, () => {
+      insertList(editor, "bullet");
+      return true;
+    }, COMMAND_PRIORITY_LOW), editor.registerCommand(REMOVE_LIST_COMMAND, () => {
+      removeList(editor);
+      return true;
+    }, COMMAND_PRIORITY_LOW), editor.registerCommand(INSERT_PARAGRAPH_COMMAND, () => {
+      const hasHandledInsertParagraph = $handleListInsertParagraph();
+      if (hasHandledInsertParagraph) return true;
+      return false;
+    }, COMMAND_PRIORITY_LOW));
   });
 }
 
 // src/composables/usePlainTextSetup.ts
-import { registerDragonSupport } from "@lexical/dragon";
-import { registerPlainText } from "@lexical/plain-text";
-import { mergeRegister as mergeRegister6 } from "@lexical/utils";
+import _defaultImport27 from "@lexical/dragon";
+const registerDragonSupport = _defaultImport27.registerDragonSupport;
+import _defaultImport28 from "@lexical/plain-text";
+const registerPlainText = _defaultImport28.registerPlainText;
+import _defaultImport29 from "@lexical/utils";
+const mergeRegister6 = _defaultImport29.mergeRegister;
 function usePlainTextSetup(editor) {
   useMounted(() => {
-    return mergeRegister6(
-      registerPlainText(editor),
-      registerDragonSupport(editor)
-    );
+    return mergeRegister6(registerPlainText(editor), registerDragonSupport(editor));
   });
 }
 
 // src/composables/useRichTextSetup.ts
-import { registerDragonSupport as registerDragonSupport2 } from "@lexical/dragon";
-import { registerRichText } from "@lexical/rich-text";
-import { mergeRegister as mergeRegister7 } from "@lexical/utils";
+import _defaultImport30 from "@lexical/dragon";
+const registerDragonSupport2 = _defaultImport30.registerDragonSupport;
+import _defaultImport31 from "@lexical/rich-text";
+const registerRichText = _defaultImport31.registerRichText;
+import _defaultImport32 from "@lexical/utils";
+const mergeRegister7 = _defaultImport32.mergeRegister;
 function useRichTextSetup(editor) {
   useMounted(() => {
-    return mergeRegister7(
-      registerRichText(editor),
-      registerDragonSupport2(editor)
-    );
+    return mergeRegister7(registerRichText(editor), registerDragonSupport2(editor));
   });
 }
 
 // src/composables/typeaheadMenu.ts
-import { ref as ref5, unref as unref5 } from "vue";
+import _defaultImport33 from "vue";
+const unref5 = _defaultImport33.unref;
+const ref5 = _defaultImport33.ref;
 var PUNCTUATION = `\\.,\\+\\*\\?\\$\\@\\|#{}\\(\\)\\^\\-\\[\\]\\\\/!%'"~=<>_:;`;
 var TypeaheadOption = class {
   key;
   elRef;
   constructor(key) {
     this.key = key;
-    if (this.elRef)
-      this.elRef.value = null;
+    if (this.elRef) this.elRef.value = null;
     this.setRefElement = this.setRefElement.bind(this);
   }
   setRefElement(element) {
-    if (this.elRef)
-      this.elRef.value = element;
+    if (this.elRef) this.elRef.value = element;
   }
 };
-function useBasicTypeaheadTriggerMatch(trigger, { minLength = 1, maxLength = 75 }) {
-  return (text) => {
+function useBasicTypeaheadTriggerMatch(trigger, {
+  minLength = 1,
+  maxLength = 75
+}) {
+  return text => {
     const validChars = `[^${trigger}${PUNCTUATION}\\s]`;
-    const TypeaheadTriggerRegex = new RegExp(
-      `(^|\\s|\\()([${trigger}]((?:${validChars}){0,${maxLength}}))$`
-    );
+    const TypeaheadTriggerRegex = new RegExp(`(^|\\s|\\()([${trigger}]((?:${validChars}){0,${maxLength}}))$`);
     const match = TypeaheadTriggerRegex.exec(text);
     if (match !== null) {
       const maybeLeadingWhitespace = match[1];
@@ -704,14 +640,18 @@ function useMenuAnchorRef(resolution, setResolution, className) {
     const rootElement = editor.getRootElement();
     const containerDiv = anchorElementRef.value;
     if (rootElement !== null && unref5(resolution) !== null) {
-      const { left, top, width, height } = unref5(resolution).getRect();
+      const {
+        left,
+        top,
+        width,
+        height
+      } = unref5(resolution).getRect();
       containerDiv.style.top = `${top + window.pageYOffset}px`;
       containerDiv.style.left = `${left + window.pageXOffset}px`;
       containerDiv.style.height = `${height}px`;
       containerDiv.style.width = `${width}px`;
       if (!containerDiv.isConnected) {
-        if (className)
-          containerDiv.className = className;
+        if (className) containerDiv.className = className;
         containerDiv.setAttribute("aria-label", "Typeahead menu");
         containerDiv.setAttribute("id", "typeahead-menu");
         containerDiv.setAttribute("role", "listbox");
@@ -728,44 +668,31 @@ function useMenuAnchorRef(resolution, setResolution, className) {
     if (unref5(resolution) !== null) {
       positionMenu();
       return () => {
-        if (rootElement !== null)
-          rootElement.removeAttribute("aria-controls");
+        if (rootElement !== null) rootElement.removeAttribute("aria-controls");
         const containerDiv = anchorElementRef.value;
-        if (containerDiv !== null && containerDiv.isConnected)
-          containerDiv.remove();
+        if (containerDiv !== null && containerDiv.isConnected) containerDiv.remove();
       };
     }
   });
-  const onVisibilityChange = (isInView) => {
+  const onVisibilityChange = isInView => {
     if (unref5(resolution) !== null) {
-      if (!isInView)
-        setResolution(null);
+      if (!isInView) setResolution(null);
     }
   };
-  useDynamicPositioning(
-    resolution,
-    anchorElementRef,
-    positionMenu,
-    onVisibilityChange
-  );
+  useDynamicPositioning(resolution, anchorElementRef, positionMenu, onVisibilityChange);
   return anchorElementRef;
 }
 function getScrollParent(element, includeHidden) {
   let style = getComputedStyle(element);
   const excludeStaticParent = style.position === "absolute";
   const overflowRegex = includeHidden ? /(auto|scroll|hidden)/ : /(auto|scroll)/;
-  if (style.position === "fixed")
-    return document.body;
-  for (
-    let parent = element;
-    // eslint-disable-next-line no-cond-assign
-    parent = parent.parentElement;
-  ) {
+  if (style.position === "fixed") return document.body;
+  for (let parent = element;
+  // eslint-disable-next-line no-cond-assign
+  parent = parent.parentElement;) {
     style = getComputedStyle(parent);
-    if (excludeStaticParent && style.position === "static")
-      continue;
-    if (overflowRegex.test(style.overflow + style.overflowY + style.overflowX))
-      return parent;
+    if (excludeStaticParent && style.position === "static") continue;
+    if (overflowRegex.test(style.overflow + style.overflowY + style.overflowX)) return parent;
   }
   return document.body;
 }
@@ -781,11 +708,8 @@ function useDynamicPositioning(resolution, targetElement, onReposition, onVisibi
       const rootElement = editor.getRootElement();
       const rootScrollParent = rootElement !== null ? getScrollParent(rootElement, false) : document.body;
       let ticking = false;
-      let previousIsInView = isTriggerVisibleInNearestScrollContainer(
-        unref5(targetElement),
-        rootScrollParent
-      );
-      const handleScroll = function() {
+      let previousIsInView = isTriggerVisibleInNearestScrollContainer(unref5(targetElement), rootScrollParent);
+      const handleScroll = function () {
         if (!ticking) {
           window.requestAnimationFrame(() => {
             onReposition();
@@ -793,14 +717,10 @@ function useDynamicPositioning(resolution, targetElement, onReposition, onVisibi
           });
           ticking = true;
         }
-        const isInView = isTriggerVisibleInNearestScrollContainer(
-          unref5(targetElement),
-          rootScrollParent
-        );
+        const isInView = isTriggerVisibleInNearestScrollContainer(unref5(targetElement), rootScrollParent);
         if (isInView !== previousIsInView) {
           previousIsInView = isInView;
-          if (onVisibilityChange != null)
-            onVisibilityChange(isInView);
+          if (onVisibilityChange != null) onVisibilityChange(isInView);
         }
       };
       const resizeObserver = new ResizeObserver(onReposition);
@@ -820,39 +740,69 @@ function useDynamicPositioning(resolution, targetElement, onReposition, onVisibi
 }
 
 // src/composables/useLexicalTypeaheadMenuPlugin.ts
-import { defineComponent, h as h2 } from "vue";
-
+import _defaultImport34 from "vue";
 // unplugin-vue:/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalTypeaheadMenuPlugin.vue?vue&type=script&setup=true&lang.ts
-import { defineComponent as _defineComponent2 } from "vue";
-import { unref as _unref, normalizeProps as _normalizeProps, guardReactiveProps as _guardReactiveProps, renderSlot as _renderSlot2, withCtx as _withCtx, openBlock as _openBlock, createBlock as _createBlock, createCommentVNode as _createCommentVNode } from "vue";
-import { $getSelection as $getSelection4, $isRangeSelection as $isRangeSelection3, $isTextNode as $isTextNode3 } from "lexical";
-import { ref as ref7 } from "vue";
-
+const h2 = _defaultImport34.h;
+const defineComponent = _defaultImport34.defineComponent;
+import _defaultImport35 from "vue";
+const _defineComponent2 = _defaultImport35.defineComponent;
+import _defaultImport36 from "vue";
+const _createCommentVNode = _defaultImport36.createCommentVNode;
+const _createBlock = _defaultImport36.createBlock;
+const _openBlock = _defaultImport36.openBlock;
+const _withCtx = _defaultImport36.withCtx;
+const _renderSlot2 = _defaultImport36.renderSlot;
+const _guardReactiveProps = _defaultImport36.guardReactiveProps;
+const _normalizeProps = _defaultImport36.normalizeProps;
+const _unref = _defaultImport36.unref;
+import _defaultImport37 from "lexical";
+const $isTextNode3 = _defaultImport37.$isTextNode;
+const $isRangeSelection3 = _defaultImport37.$isRangeSelection;
+const $getSelection4 = _defaultImport37.$getSelection;
+import _defaultImport38 from "vue";
 // unplugin-vue:/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalPopoverMenu.vue?vue&type=script&setup=true&lang.ts
-import { defineComponent as _defineComponent } from "vue";
-import { renderSlot as _renderSlot } from "vue";
-import { mergeRegister as mergeRegister8 } from "@lexical/utils";
-import {
-  $getSelection as $getSelection3,
-  $isRangeSelection as $isRangeSelection2,
-  COMMAND_PRIORITY_LOW as COMMAND_PRIORITY_LOW2,
-  KEY_ARROW_DOWN_COMMAND,
-  KEY_ARROW_UP_COMMAND,
-  KEY_ENTER_COMMAND,
-  KEY_ESCAPE_COMMAND,
-  KEY_TAB_COMMAND,
-  createCommand
-} from "lexical";
-import { computed as computed3, ref as ref6, watch, watchPostEffect as watchPostEffect3 } from "vue";
-var LexicalPopoverMenu_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */ _defineComponent({
+const ref7 = _defaultImport38.ref;
+import _defaultImport39 from "vue";
+const _defineComponent = _defaultImport39.defineComponent;
+import _defaultImport40 from "vue";
+const _renderSlot = _defaultImport40.renderSlot;
+import _defaultImport41 from "@lexical/utils";
+const mergeRegister8 = _defaultImport41.mergeRegister;
+import _defaultImport42 from "lexical";
+const createCommand = _defaultImport42.createCommand;
+const KEY_TAB_COMMAND = _defaultImport42.KEY_TAB_COMMAND;
+const KEY_ESCAPE_COMMAND = _defaultImport42.KEY_ESCAPE_COMMAND;
+const KEY_ENTER_COMMAND = _defaultImport42.KEY_ENTER_COMMAND;
+const KEY_ARROW_UP_COMMAND = _defaultImport42.KEY_ARROW_UP_COMMAND;
+const KEY_ARROW_DOWN_COMMAND = _defaultImport42.KEY_ARROW_DOWN_COMMAND;
+const COMMAND_PRIORITY_LOW2 = _defaultImport42.COMMAND_PRIORITY_LOW;
+const $isRangeSelection2 = _defaultImport42.$isRangeSelection;
+const $getSelection3 = _defaultImport42.$getSelection;
+import _defaultImport43 from "vue";
+const watchPostEffect3 = _defaultImport43.watchPostEffect;
+const watch = _defaultImport43.watch;
+const ref6 = _defaultImport43.ref;
+const computed3 = _defaultImport43.computed;
+var LexicalPopoverMenu_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */_defineComponent({
   __name: "LexicalPopoverMenu",
   props: {
-    anchorElementRef: { type: null, required: true },
-    resolution: { type: Object, required: true },
-    options: { type: Array, required: true }
+    anchorElementRef: {
+      type: null,
+      required: true
+    },
+    resolution: {
+      type: Object,
+      required: true
+    },
+    options: {
+      type: Array,
+      required: true
+    }
   },
   emits: ["close", "selectOption"],
-  setup(__props, { emit }) {
+  setup(__props, {
+    emit
+  }) {
     const props = __props;
     const SCROLL_TYPEAHEAD_OPTION_INTO_VIEW_COMMAND = createCommand("SCROLL_TYPEAHEAD_OPTION_INTO_VIEW_COMMAND");
     const editor = useEditor();
@@ -862,46 +812,31 @@ var LexicalPopoverMenu_vue_vue_type_script_setup_true_lang_default = /* @__PURE_
     });
     function splitNodeContainingQuery(editor2, match) {
       const selection = $getSelection3();
-      if (!$isRangeSelection2(selection) || !selection.isCollapsed())
-        return null;
+      if (!$isRangeSelection2(selection) || !selection.isCollapsed()) return null;
       const anchor = selection.anchor;
-      if (anchor.type !== "text")
-        return null;
+      if (anchor.type !== "text") return null;
       const anchorNode = anchor.getNode();
-      if (!anchorNode.isSimpleText())
-        return null;
+      if (!anchorNode.isSimpleText()) return null;
       const selectionOffset = anchor.offset;
       const textContent = anchorNode.getTextContent().slice(0, selectionOffset);
       const characterOffset = match.replaceableString.length;
-      const queryOffset = getFullMatchOffset(
-        textContent,
-        match.matchingString,
-        characterOffset
-      );
+      const queryOffset = getFullMatchOffset(textContent, match.matchingString, characterOffset);
       const startOffset = selectionOffset - queryOffset;
-      if (startOffset < 0)
-        return null;
+      if (startOffset < 0) return null;
       let newNode;
-      if (startOffset === 0)
-        [newNode] = anchorNode.splitText(selectionOffset);
-      else
-        [, newNode] = anchorNode.splitText(startOffset, selectionOffset);
+      if (startOffset === 0) [newNode] = anchorNode.splitText(selectionOffset);else [, newNode] = anchorNode.splitText(startOffset, selectionOffset);
       return newNode;
     }
     function getFullMatchOffset(documentText, entryText, offset) {
       let triggerOffset = offset;
       for (let i = triggerOffset; i <= entryText.length; i++) {
-        if (documentText.substr(-i) === entryText.substr(0, i))
-          triggerOffset = i;
+        if (documentText.substr(-i) === entryText.substr(0, i)) triggerOffset = i;
       }
       return triggerOffset;
     }
     function selectOptionAndCleanUp(selectedEntry) {
       editor.update(() => {
-        const textNodeContainingQuery = splitNodeContainingQuery(
-          editor,
-          props.resolution.match
-        );
+        const textNodeContainingQuery = splitNodeContainingQuery(editor, props.resolution.match);
         emit("selectOption", {
           close() {
             emit("close");
@@ -915,18 +850,12 @@ var LexicalPopoverMenu_vue_vue_type_script_setup_true_lang_default = /* @__PURE_
     function updateSelectedIndex(index) {
       const rootElem = editor.getRootElement();
       if (rootElem !== null) {
-        rootElem.setAttribute(
-          "aria-activedescendant",
-          `typeahead-item-${index}`
-        );
+        rootElem.setAttribute("aria-activedescendant", `typeahead-item-${index}`);
         selectedIndex.value = index;
       }
     }
     watchPostEffect3(() => {
-      if (props.options === null)
-        selectedIndex.value = null;
-      else if (selectedIndex.value === null)
-        updateSelectedIndex(0);
+      if (props.options === null) selectedIndex.value = null;else if (selectedIndex.value === null) updateSelectedIndex(0);
     });
     function scrollIntoViewIfNeeded(target) {
       const container = document.getElementById("typeahead-menu");
@@ -934,8 +863,7 @@ var LexicalPopoverMenu_vue_vue_type_script_setup_true_lang_default = /* @__PURE_
         const parentNode = target.parentNode;
         if (parentNode && /auto|scroll/.test(getComputedStyle(parentNode).overflow)) {
           const parentRect = parentNode.getBoundingClientRect();
-          if (parentRect.top + parentRect.height > window.innerHeight)
-            parentNode.scrollIntoView(false);
+          if (parentRect.top + parentRect.height > window.innerHeight) parentNode.scrollIntoView(false);
           parentNode.scrollTop = target.offsetTop - target.clientHeight;
         } else {
           target.scrollIntoView(false);
@@ -943,111 +871,73 @@ var LexicalPopoverMenu_vue_vue_type_script_setup_true_lang_default = /* @__PURE_
       }
     }
     useMounted(() => {
-      return mergeRegister8(
-        editor.registerCommand(
-          SCROLL_TYPEAHEAD_OPTION_INTO_VIEW_COMMAND,
-          ({ option }) => {
-            if (option.elRef?.value) {
-              scrollIntoViewIfNeeded(option.elRef.value);
-              return true;
-            }
-            return false;
-          },
-          COMMAND_PRIORITY_LOW2
-        )
-      );
+      return mergeRegister8(editor.registerCommand(SCROLL_TYPEAHEAD_OPTION_INTO_VIEW_COMMAND, ({
+        option
+      }) => {
+        if (option.elRef?.value) {
+          scrollIntoViewIfNeeded(option.elRef.value);
+          return true;
+        }
+        return false;
+      }, COMMAND_PRIORITY_LOW2));
     });
     useEffect(() => {
-      return mergeRegister8(
-        editor.registerCommand(
-          KEY_ARROW_DOWN_COMMAND,
-          (payload) => {
-            const event = payload;
-            if (props.options !== null && props.options.length && selectedIndex.value !== null) {
-              const newSelectedIndex = selectedIndex.value !== props.options.length - 1 ? selectedIndex.value + 1 : 0;
-              updateSelectedIndex(newSelectedIndex);
-              const option = props.options[newSelectedIndex];
-              if (option.elRef?.value !== null && option.elRef?.value) {
-                editor.dispatchCommand(
-                  SCROLL_TYPEAHEAD_OPTION_INTO_VIEW_COMMAND,
-                  {
-                    index: newSelectedIndex,
-                    option
-                  }
-                );
-              }
-              event.preventDefault();
-              event.stopImmediatePropagation();
-            }
-            return true;
-          },
-          COMMAND_PRIORITY_LOW2
-        ),
-        editor.registerCommand(
-          KEY_ARROW_UP_COMMAND,
-          (payload) => {
-            const event = payload;
-            if (props.options !== null && props.options.length && selectedIndex.value !== null) {
-              const newSelectedIndex = selectedIndex.value !== 0 ? selectedIndex.value - 1 : props.options.length - 1;
-              updateSelectedIndex(newSelectedIndex);
-              const option = props.options[newSelectedIndex];
-              if (option.elRef?.value !== null && option.elRef?.value)
-                scrollIntoViewIfNeeded(option.elRef.value);
-              event.preventDefault();
-              event.stopImmediatePropagation();
-            }
-            return true;
-          },
-          COMMAND_PRIORITY_LOW2
-        ),
-        editor.registerCommand(
-          KEY_ESCAPE_COMMAND,
-          (payload) => {
-            const event = payload;
-            event.preventDefault();
-            event.stopImmediatePropagation();
-            emit("close");
-            return true;
-          },
-          COMMAND_PRIORITY_LOW2
-        ),
-        editor.registerCommand(
-          KEY_TAB_COMMAND,
-          (payload) => {
-            const event = payload;
-            if (props.options === null || selectedIndex.value === null || props.options[selectedIndex.value] == null)
-              return false;
-            event.preventDefault();
-            event.stopImmediatePropagation();
-            selectOptionAndCleanUp(props.options[selectedIndex.value]);
-            return true;
-          },
-          COMMAND_PRIORITY_LOW2
-        ),
-        editor.registerCommand(
-          KEY_ENTER_COMMAND,
-          (event) => {
-            if (props.options === null || selectedIndex.value === null || props.options[selectedIndex.value] == null)
-              return false;
-            if (event !== null) {
-              event.preventDefault();
-              event.stopImmediatePropagation();
-            }
-            selectOptionAndCleanUp(props.options[selectedIndex.value]);
-            return true;
-          },
-          COMMAND_PRIORITY_LOW2
-        )
-      );
+      return mergeRegister8(editor.registerCommand(KEY_ARROW_DOWN_COMMAND, payload => {
+        const event = payload;
+        if (props.options !== null && props.options.length && selectedIndex.value !== null) {
+          const newSelectedIndex = selectedIndex.value !== props.options.length - 1 ? selectedIndex.value + 1 : 0;
+          updateSelectedIndex(newSelectedIndex);
+          const option = props.options[newSelectedIndex];
+          if (option.elRef?.value !== null && option.elRef?.value) {
+            editor.dispatchCommand(SCROLL_TYPEAHEAD_OPTION_INTO_VIEW_COMMAND, {
+              index: newSelectedIndex,
+              option
+            });
+          }
+          event.preventDefault();
+          event.stopImmediatePropagation();
+        }
+        return true;
+      }, COMMAND_PRIORITY_LOW2), editor.registerCommand(KEY_ARROW_UP_COMMAND, payload => {
+        const event = payload;
+        if (props.options !== null && props.options.length && selectedIndex.value !== null) {
+          const newSelectedIndex = selectedIndex.value !== 0 ? selectedIndex.value - 1 : props.options.length - 1;
+          updateSelectedIndex(newSelectedIndex);
+          const option = props.options[newSelectedIndex];
+          if (option.elRef?.value !== null && option.elRef?.value) scrollIntoViewIfNeeded(option.elRef.value);
+          event.preventDefault();
+          event.stopImmediatePropagation();
+        }
+        return true;
+      }, COMMAND_PRIORITY_LOW2), editor.registerCommand(KEY_ESCAPE_COMMAND, payload => {
+        const event = payload;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        emit("close");
+        return true;
+      }, COMMAND_PRIORITY_LOW2), editor.registerCommand(KEY_TAB_COMMAND, payload => {
+        const event = payload;
+        if (props.options === null || selectedIndex.value === null || props.options[selectedIndex.value] == null) return false;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        selectOptionAndCleanUp(props.options[selectedIndex.value]);
+        return true;
+      }, COMMAND_PRIORITY_LOW2), editor.registerCommand(KEY_ENTER_COMMAND, event => {
+        if (props.options === null || selectedIndex.value === null || props.options[selectedIndex.value] == null) return false;
+        if (event !== null) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+        }
+        selectOptionAndCleanUp(props.options[selectedIndex.value]);
+        return true;
+      }, COMMAND_PRIORITY_LOW2));
     });
-    const listItemProps = computed3(
-      () => ({
-        options: props.options,
-        selectOptionAndCleanUp,
-        selectedIndex: selectedIndex.value,
-        setHighlightedIndex: updateSelectedIndex
-      })
-    );
+    const listItemProps = computed3(() => ({
+      options: props.options,
+      selectOptionAndCleanUp,
+      selectedIndex: selectedIndex.value,
+      setHighlightedIndex: updateSelectedIndex
+    }));
     return (_ctx, _cache) => {
       return _renderSlot(_ctx.$slots, "default", {
         listItemProps: listItemProps.value,
@@ -1068,42 +958,46 @@ var export_helper_default = (sfc, props) => {
 };
 
 // src/components/LexicalPopoverMenu.vue
-var LexicalPopoverMenu_default = /* @__PURE__ */ export_helper_default(LexicalPopoverMenu_vue_vue_type_script_setup_true_lang_default, [["__file", "/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalPopoverMenu.vue"]]);
+var LexicalPopoverMenu_default = /* @__PURE__ */export_helper_default(LexicalPopoverMenu_vue_vue_type_script_setup_true_lang_default, [["__file", "/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalPopoverMenu.vue"]]);
 
 // unplugin-vue:/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalTypeaheadMenuPlugin.vue?vue&type=script&setup=true&lang.ts
-var LexicalTypeaheadMenuPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */ _defineComponent2({
+var LexicalTypeaheadMenuPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */_defineComponent2({
   __name: "LexicalTypeaheadMenuPlugin",
   props: {
-    anchorClassName: { type: String, required: false },
-    triggerFn: { type: Function, required: true },
-    options: { type: Array, required: true }
+    anchorClassName: {
+      type: String,
+      required: false
+    },
+    triggerFn: {
+      type: Function,
+      required: true
+    },
+    options: {
+      type: Array,
+      required: true
+    }
   },
   emits: ["close", "open", "queryChange", "selectOption"],
-  setup(__props, { emit }) {
+  setup(__props, {
+    emit
+  }) {
     const props = __props;
     const editor = useEditor();
     const resolution = ref7(null);
     function setResolution(value) {
       resolution.value = value;
     }
-    const anchorElementRef = useMenuAnchorRef(
-      resolution,
-      setResolution,
-      props.anchorClassName
-    );
+    const anchorElementRef = useMenuAnchorRef(resolution, setResolution, props.anchorClassName);
     function closeTypeahead() {
       setResolution(null);
-      if (resolution.value !== null)
-        emit("close");
+      if (resolution.value !== null) emit("close");
     }
     function openTypeahead(res) {
       setResolution(res);
-      if (resolution.value === null)
-        emit("open", res);
+      if (resolution.value === null) emit("open", res);
     }
     function isSelectionOnEntityBoundary(offset) {
-      if (offset !== 0)
-        return false;
+      if (offset !== 0) return false;
       return editor.getEditorState().read(() => {
         const selection = $getSelection4();
         if ($isRangeSelection3(selection)) {
@@ -1117,23 +1011,19 @@ var LexicalTypeaheadMenuPlugin_vue_vue_type_script_setup_true_lang_default = /* 
     }
     function getTextUpToAnchor(selection) {
       const anchor = selection.anchor;
-      if (anchor.type !== "text")
-        return null;
+      if (anchor.type !== "text") return null;
       const anchorNode = anchor.getNode();
-      if (!anchorNode.isSimpleText())
-        return null;
+      if (!anchorNode.isSimpleText()) return null;
       const anchorOffset = anchor.offset;
       return anchorNode.getTextContent().slice(0, anchorOffset);
     }
     function tryToPositionRange(leadOffset, range) {
       const domSelection = window.getSelection();
-      if (domSelection === null || !domSelection.isCollapsed)
-        return false;
+      if (domSelection === null || !domSelection.isCollapsed) return false;
       const anchorNode = domSelection.anchorNode;
       const startOffset = leadOffset;
       const endOffset = domSelection.anchorOffset;
-      if (anchorNode == null || endOffset == null)
-        return false;
+      if (anchorNode == null || endOffset == null) return false;
       try {
         range.setStart(anchorNode, startOffset);
         range.setEnd(anchorNode, endOffset);
@@ -1146,8 +1036,7 @@ var LexicalTypeaheadMenuPlugin_vue_vue_type_script_setup_true_lang_default = /* 
       let text = null;
       editor2.getEditorState().read(() => {
         const selection = $getSelection4();
-        if (!$isRangeSelection3(selection))
-          return;
+        if (!$isRangeSelection3(selection)) return;
         text = getTextUpToAnchor(selection);
       });
       return text;
@@ -1186,11 +1075,9 @@ var LexicalTypeaheadMenuPlugin_vue_vue_type_script_setup_true_lang_default = /* 
         resolution: resolution.value,
         options: _ctx.options,
         onClose: closeTypeahead,
-        onSelectOption: _cache[0] || (_cache[0] = ($event) => _ctx.$emit("selectOption", $event))
+        onSelectOption: _cache[0] || (_cache[0] = $event => _ctx.$emit("selectOption", $event))
       }, {
-        default: _withCtx((slotProps) => [
-          _renderSlot2(_ctx.$slots, "default", _normalizeProps(_guardReactiveProps(slotProps)))
-        ]),
+        default: _withCtx(slotProps => [_renderSlot2(_ctx.$slots, "default", _normalizeProps(_guardReactiveProps(slotProps)))]),
         _: 3
         /* FORWARDED */
       }, 8, ["anchor-element-ref", "resolution", "options"])) : _createCommentVNode("v-if", true);
@@ -1199,41 +1086,46 @@ var LexicalTypeaheadMenuPlugin_vue_vue_type_script_setup_true_lang_default = /* 
 });
 
 // src/components/LexicalTypeaheadMenuPlugin.vue
-var LexicalTypeaheadMenuPlugin_default = /* @__PURE__ */ export_helper_default(LexicalTypeaheadMenuPlugin_vue_vue_type_script_setup_true_lang_default, [["__file", "/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalTypeaheadMenuPlugin.vue"]]);
+var LexicalTypeaheadMenuPlugin_default = /* @__PURE__ */export_helper_default(LexicalTypeaheadMenuPlugin_vue_vue_type_script_setup_true_lang_default, [["__file", "/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalTypeaheadMenuPlugin.vue"]]);
 
 // src/composables/useLexicalTypeaheadMenuPlugin.ts
 function useLexicalTypeaheadMenuPlugin() {
-  const wrapper = defineComponent((props, { slots }) => {
+  const wrapper = defineComponent((props, {
+    slots
+  }) => {
     return () => h2(LexicalTypeaheadMenuPlugin_default, props, slots);
   });
   return wrapper;
 }
 
 // src/composables/useYjsCollaboration.ts
-import { mergeRegister as mergeRegister9 } from "@lexical/utils";
-import {
-  CONNECTED_COMMAND,
-  TOGGLE_CONNECT_COMMAND,
-  createBinding,
-  createUndoManager,
-  initLocalState,
-  setLocalStateFocus,
-  syncCursorPositions,
-  syncLexicalUpdateToYjs,
-  syncYjsChangesToLexical
-} from "@lexical/yjs";
-import {
-  $createParagraphNode,
-  $getRoot,
-  $getSelection as $getSelection5,
-  BLUR_COMMAND,
-  COMMAND_PRIORITY_EDITOR,
-  FOCUS_COMMAND,
-  REDO_COMMAND,
-  UNDO_COMMAND
-} from "lexical";
-import { UndoManager } from "yjs";
-import { computed as computed4, ref as ref8, toRaw } from "vue";
+import _defaultImport44 from "@lexical/utils";
+const mergeRegister9 = _defaultImport44.mergeRegister;
+import _defaultImport45 from "@lexical/yjs";
+const syncYjsChangesToLexical = _defaultImport45.syncYjsChangesToLexical;
+const syncLexicalUpdateToYjs = _defaultImport45.syncLexicalUpdateToYjs;
+const syncCursorPositions = _defaultImport45.syncCursorPositions;
+const setLocalStateFocus = _defaultImport45.setLocalStateFocus;
+const initLocalState = _defaultImport45.initLocalState;
+const createUndoManager = _defaultImport45.createUndoManager;
+const createBinding = _defaultImport45.createBinding;
+const TOGGLE_CONNECT_COMMAND = _defaultImport45.TOGGLE_CONNECT_COMMAND;
+const CONNECTED_COMMAND = _defaultImport45.CONNECTED_COMMAND;
+import _defaultImport46 from "lexical";
+const UNDO_COMMAND = _defaultImport46.UNDO_COMMAND;
+const REDO_COMMAND = _defaultImport46.REDO_COMMAND;
+const FOCUS_COMMAND = _defaultImport46.FOCUS_COMMAND;
+const COMMAND_PRIORITY_EDITOR = _defaultImport46.COMMAND_PRIORITY_EDITOR;
+const BLUR_COMMAND = _defaultImport46.BLUR_COMMAND;
+const $getSelection5 = _defaultImport46.$getSelection;
+const $getRoot = _defaultImport46.$getRoot;
+const $createParagraphNode = _defaultImport46.$createParagraphNode;
+import _defaultImport47 from "yjs";
+const UndoManager = _defaultImport47.UndoManager;
+import _defaultImport48 from "vue";
+const toRaw = _defaultImport48.toRaw;
+const ref8 = _defaultImport48.ref;
+const computed4 = _defaultImport48.computed;
 function useYjsCollaboration(editor, id, provider, docMap, name, color, shouldBootstrap, initialEditorState, excludedProperties, awarenessData) {
   const isReloadingDoc = ref8(false);
   const doc = ref8(docMap.get(id));
@@ -1244,18 +1136,22 @@ function useYjsCollaboration(editor, id, provider, docMap, name, color, shouldBo
   const disconnect = () => {
     try {
       provider.disconnect();
-    } catch (e) {
-    }
+    } catch (e) {}
   };
   useEffect(() => {
-    const { root } = binding.value;
-    const { awareness } = provider;
-    const onStatus = ({ status }) => {
+    const {
+      root
+    } = binding.value;
+    const {
+      awareness
+    } = provider;
+    const onStatus = ({
+      status
+    }) => {
       editor.dispatchCommand(CONNECTED_COMMAND, status === "connected");
     };
-    const onSync = (isSynced) => {
-      if (shouldBootstrap && isSynced && root.isEmpty() && root._xmlText._length === 0 && isReloadingDoc.value === false)
-        initializeEditor(editor, initialEditorState);
+    const onSync = isSynced => {
+      if (shouldBootstrap && isSynced && root.isEmpty() && root._xmlText._length === 0 && isReloadingDoc.value === false) initializeEditor(editor, initialEditorState);
       isReloadingDoc.value = false;
     };
     const onAwarenessUpdate = () => {
@@ -1268,14 +1164,8 @@ function useYjsCollaboration(editor, id, provider, docMap, name, color, shouldBo
         syncYjsChangesToLexical(binding.value, provider, events, isFromUndoManger);
       }
     };
-    initLocalState(
-      provider,
-      name,
-      color,
-      document.activeElement === editor.getRootElement(),
-      awarenessData || {}
-    );
-    const onProviderDocReload = (ydoc) => {
+    initLocalState(provider, name, color, document.activeElement === editor.getRootElement(), awarenessData || {});
+    const onProviderDocReload = ydoc => {
       clearEditorSkipCollab(editor, binding.value);
       doc.value = ydoc;
       docMap.set(id, ydoc);
@@ -1286,26 +1176,21 @@ function useYjsCollaboration(editor, id, provider, docMap, name, color, shouldBo
     provider.on("sync", onSync);
     awareness.on("update", onAwarenessUpdate);
     root.getSharedType().observeDeep(onYjsTreeChanges);
-    const removeListener = editor.registerUpdateListener(
-      ({ prevEditorState, editorState, dirtyLeaves, dirtyElements, normalizedNodes, tags }) => {
-        if (tags.has("skip-collab") === false) {
-          syncLexicalUpdateToYjs(
-            binding.value,
-            provider,
-            prevEditorState,
-            editorState,
-            dirtyElements,
-            dirtyLeaves,
-            normalizedNodes,
-            tags
-          );
-        }
+    const removeListener = editor.registerUpdateListener(({
+      prevEditorState,
+      editorState,
+      dirtyLeaves,
+      dirtyElements,
+      normalizedNodes,
+      tags
+    }) => {
+      if (tags.has("skip-collab") === false) {
+        syncLexicalUpdateToYjs(binding.value, provider, prevEditorState, editorState, dirtyElements, dirtyLeaves, normalizedNodes, tags);
       }
-    );
+    });
     connect();
     return () => {
-      if (isReloadingDoc.value === false)
-        disconnect();
+      if (isReloadingDoc.value === false) disconnect();
       provider.off("sync", onSync);
       provider.off("status", onStatus);
       provider.off("reload", onProviderDocReload);
@@ -1316,46 +1201,31 @@ function useYjsCollaboration(editor, id, provider, docMap, name, color, shouldBo
     };
   });
   useEffect(() => {
-    return editor.registerCommand(
-      TOGGLE_CONNECT_COMMAND,
-      (payload) => {
-        if (connect !== void 0 && disconnect !== void 0) {
-          const shouldConnect = payload;
-          if (shouldConnect) {
-            console.log("Collaboration connected!");
-            connect();
-          } else {
-            console.log("Collaboration disconnected!");
-            disconnect();
-          }
+    return editor.registerCommand(TOGGLE_CONNECT_COMMAND, payload => {
+      if (connect !== void 0 && disconnect !== void 0) {
+        const shouldConnect = payload;
+        if (shouldConnect) {
+          console.log("Collaboration connected!");
+          connect();
+        } else {
+          console.log("Collaboration disconnected!");
+          disconnect();
         }
-        return true;
-      },
-      COMMAND_PRIORITY_EDITOR
-    );
+      }
+      return true;
+    }, COMMAND_PRIORITY_EDITOR);
   });
   return binding;
 }
 function useYjsFocusTracking(editor, provider, name, color, awarenessData) {
   useEffect(() => {
-    return mergeRegister9(
-      editor.registerCommand(
-        FOCUS_COMMAND,
-        () => {
-          setLocalStateFocus(provider, name, color, true, awarenessData || {});
-          return false;
-        },
-        COMMAND_PRIORITY_EDITOR
-      ),
-      editor.registerCommand(
-        BLUR_COMMAND,
-        () => {
-          setLocalStateFocus(provider, name, color, false, awarenessData || {});
-          return false;
-        },
-        COMMAND_PRIORITY_EDITOR
-      )
-    );
+    return mergeRegister9(editor.registerCommand(FOCUS_COMMAND, () => {
+      setLocalStateFocus(provider, name, color, true, awarenessData || {});
+      return false;
+    }, COMMAND_PRIORITY_EDITOR), editor.registerCommand(BLUR_COMMAND, () => {
+      setLocalStateFocus(provider, name, color, false, awarenessData || {});
+      return false;
+    }, COMMAND_PRIORITY_EDITOR));
   });
 }
 function useYjsHistory(editor, binding) {
@@ -1367,24 +1237,13 @@ function useYjsHistory(editor, binding) {
     const redo = () => {
       undoManager.value.redo();
     };
-    return mergeRegister9(
-      editor.registerCommand(
-        UNDO_COMMAND,
-        () => {
-          undo();
-          return true;
-        },
-        COMMAND_PRIORITY_EDITOR
-      ),
-      editor.registerCommand(
-        REDO_COMMAND,
-        () => {
-          redo();
-          return true;
-        },
-        COMMAND_PRIORITY_EDITOR
-      )
-    );
+    return mergeRegister9(editor.registerCommand(UNDO_COMMAND, () => {
+      undo();
+      return true;
+    }, COMMAND_PRIORITY_EDITOR), editor.registerCommand(REDO_COMMAND, () => {
+      redo();
+      return true;
+    }, COMMAND_PRIORITY_EDITOR));
   });
   const clearHistory = () => {
     undoManager.value.clear();
@@ -1392,80 +1251,77 @@ function useYjsHistory(editor, binding) {
   return clearHistory;
 }
 function initializeEditor(editor, initialEditorState) {
-  editor.update(
-    () => {
-      const root = $getRoot();
-      if (root.isEmpty()) {
-        if (initialEditorState) {
-          switch (typeof initialEditorState) {
-            case "string": {
+  editor.update(() => {
+    const root = $getRoot();
+    if (root.isEmpty()) {
+      if (initialEditorState) {
+        switch (typeof initialEditorState) {
+          case "string":
+            {
               const parsedEditorState = editor.parseEditorState(initialEditorState);
-              editor.setEditorState(parsedEditorState, { tag: "history-merge" });
+              editor.setEditorState(parsedEditorState, {
+                tag: "history-merge"
+              });
               break;
             }
-            case "object": {
-              editor.setEditorState(initialEditorState, { tag: "history-merge" });
+          case "object":
+            {
+              editor.setEditorState(initialEditorState, {
+                tag: "history-merge"
+              });
               break;
             }
-            case "function": {
-              editor.update(
-                () => {
-                  const root1 = $getRoot();
-                  if (root1.isEmpty())
-                    initialEditorState(editor);
-                },
-                { tag: "history-merge" }
-              );
+          case "function":
+            {
+              editor.update(() => {
+                const root1 = $getRoot();
+                if (root1.isEmpty()) initialEditorState(editor);
+              }, {
+                tag: "history-merge"
+              });
               break;
             }
-          }
-        } else {
-          const paragraph = $createParagraphNode();
-          root.append(paragraph);
-          const { activeElement } = document;
-          if ($getSelection5() !== null || activeElement !== null && activeElement === editor.getRootElement())
-            paragraph.select();
         }
+      } else {
+        const paragraph = $createParagraphNode();
+        root.append(paragraph);
+        const {
+          activeElement
+        } = document;
+        if ($getSelection5() !== null || activeElement !== null && activeElement === editor.getRootElement()) paragraph.select();
       }
-    },
-    {
-      tag: "history-merge"
     }
-  );
+  }, {
+    tag: "history-merge"
+  });
 }
 function clearEditorSkipCollab(editor, binding) {
-  editor.update(
-    () => {
-      const root = $getRoot();
-      root.clear();
-      root.select();
-    },
-    {
-      tag: "skip-collab"
-    }
-  );
-  if (binding.cursors == null)
-    return;
+  editor.update(() => {
+    const root = $getRoot();
+    root.clear();
+    root.select();
+  }, {
+    tag: "skip-collab"
+  });
+  if (binding.cursors == null) return;
   const cursors = binding.cursors;
-  if (cursors == null)
-    return;
+  if (cursors == null) return;
   const cursorsContainer = binding.cursorsContainer;
-  if (cursorsContainer == null)
-    return;
+  if (cursorsContainer == null) return;
   const cursorsArr = Array.from(cursors.values());
   for (let i = 0; i < cursorsArr.length; i++) {
     const cursor = cursorsArr[i];
     const selection = cursor.selection;
     if (selection && selection.selections !== null) {
       const selections = selection.selections;
-      for (let j = 0; j < selections.length; j++)
-        cursorsContainer.removeChild(selections[i]);
+      for (let j = 0; j < selections.length; j++) cursorsContainer.removeChild(selections[i]);
     }
   }
 }
 
 // src/components/LexicalDecoratedTeleports.ts
-import { defineComponent as defineComponent2 } from "vue";
+import _defaultImport49 from "vue";
+const defineComponent2 = _defaultImport49.defineComponent;
 var LexicalDecoratedTeleports_default = defineComponent2({
   name: "LexicalDecoratedTeleports",
   setup() {
@@ -1476,32 +1332,95 @@ var LexicalDecoratedTeleports_default = defineComponent2({
 });
 
 // unplugin-vue:/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalContentEditable.vue?vue&type=script&setup=true&lang.ts
-import { defineComponent as _defineComponent3 } from "vue";
-import { openBlock as _openBlock2, createElementBlock as _createElementBlock } from "vue";
-import { ref as ref9 } from "vue";
+import _defaultImport50 from "vue";
+const _defineComponent3 = _defaultImport50.defineComponent;
+import _defaultImport51 from "vue";
+const _createElementBlock = _defaultImport51.createElementBlock;
+const _openBlock2 = _defaultImport51.openBlock;
+import _defaultImport52 from "vue";
+const ref9 = _defaultImport52.ref;
 var _hoisted_1 = ["id", "aria-activedescendant", "aria-autocomplete", "aria-controls", "aria-describedby", "aria-expanded", "aria-label", "aria-labelledby", "aria-multiline", "aria-owns", "aria-required", "autocapitalize", "autocomplete", "autocorrect", "contenteditable", "role", "spellcheck", "tabindex"];
-var LexicalContentEditable_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */ _defineComponent3({
+var LexicalContentEditable_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */_defineComponent3({
   __name: "LexicalContentEditable",
   props: {
-    ariaActivedescendant: { type: String, required: false },
-    ariaAutocomplete: { type: String, required: false },
-    ariaControls: { type: String, required: false },
-    ariaDescribedby: { type: String, required: false },
-    ariaExpanded: { type: Boolean, required: false },
-    ariaLabel: { type: String, required: false },
-    ariaLabelledby: { type: String, required: false },
-    ariaMultiline: { type: Boolean, required: false },
-    ariaOwns: { type: String, required: false },
-    ariaRequired: { type: Boolean, required: false },
-    autoCapitalize: { type: Boolean, required: false },
-    autoComplete: { type: Boolean, required: false },
-    autoCorrect: { type: Boolean, required: false },
-    id: { type: String, required: false },
-    editable: { type: Boolean, required: false },
-    role: { type: String, required: false, default: "textbox" },
-    spellcheck: { type: Boolean, required: false, default: true },
-    tabindex: { type: Number, required: false },
-    enableGrammarly: { type: Boolean, required: false }
+    ariaActivedescendant: {
+      type: String,
+      required: false
+    },
+    ariaAutocomplete: {
+      type: String,
+      required: false
+    },
+    ariaControls: {
+      type: String,
+      required: false
+    },
+    ariaDescribedby: {
+      type: String,
+      required: false
+    },
+    ariaExpanded: {
+      type: Boolean,
+      required: false
+    },
+    ariaLabel: {
+      type: String,
+      required: false
+    },
+    ariaLabelledby: {
+      type: String,
+      required: false
+    },
+    ariaMultiline: {
+      type: Boolean,
+      required: false
+    },
+    ariaOwns: {
+      type: String,
+      required: false
+    },
+    ariaRequired: {
+      type: Boolean,
+      required: false
+    },
+    autoCapitalize: {
+      type: Boolean,
+      required: false
+    },
+    autoComplete: {
+      type: Boolean,
+      required: false
+    },
+    autoCorrect: {
+      type: Boolean,
+      required: false
+    },
+    id: {
+      type: String,
+      required: false
+    },
+    editable: {
+      type: Boolean,
+      required: false
+    },
+    role: {
+      type: String,
+      required: false,
+      default: "textbox"
+    },
+    spellcheck: {
+      type: Boolean,
+      required: false,
+      default: true
+    },
+    tabindex: {
+      type: Number,
+      required: false
+    },
+    enableGrammarly: {
+      type: Boolean,
+      required: false
+    }
   },
   setup(__props) {
     const root = ref9(null);
@@ -1512,7 +1431,7 @@ var LexicalContentEditable_vue_vue_type_script_setup_true_lang_default = /* @__P
         editor.setRootElement(root.value);
         editable.value = editor.isEditable();
       }
-      return editor.registerEditableListener((currentIsEditable) => {
+      return editor.registerEditableListener(currentIsEditable => {
         editable.value = currentIsEditable;
       });
     });
@@ -1544,50 +1463,66 @@ var LexicalContentEditable_vue_vue_type_script_setup_true_lang_default = /* @__P
 });
 
 // src/components/LexicalContentEditable.vue
-var LexicalContentEditable_default = /* @__PURE__ */ export_helper_default(LexicalContentEditable_vue_vue_type_script_setup_true_lang_default, [["__file", "/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalContentEditable.vue"]]);
+var LexicalContentEditable_default = /* @__PURE__ */export_helper_default(LexicalContentEditable_vue_vue_type_script_setup_true_lang_default, [["__file", "/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalContentEditable.vue"]]);
 
 // unplugin-vue:/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalPlainTextPlugin.vue?vue&type=script&setup=true&lang.ts
-import { defineComponent as _defineComponent4 } from "vue";
-import { unref as _unref2, renderSlot as _renderSlot3, createCommentVNode as _createCommentVNode2, createVNode as _createVNode, Fragment as _Fragment, openBlock as _openBlock3, createElementBlock as _createElementBlock2 } from "vue";
-var LexicalPlainTextPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */ _defineComponent4({
+import _defaultImport53 from "vue";
+const _defineComponent4 = _defaultImport53.defineComponent;
+import _defaultImport54 from "vue";
+const _createElementBlock2 = _defaultImport54.createElementBlock;
+const _openBlock3 = _defaultImport54.openBlock;
+const _Fragment = _defaultImport54.Fragment;
+const _createVNode = _defaultImport54.createVNode;
+const _createCommentVNode2 = _defaultImport54.createCommentVNode;
+const _renderSlot3 = _defaultImport54.renderSlot;
+const _unref2 = _defaultImport54.unref;
+var LexicalPlainTextPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */_defineComponent4({
   __name: "LexicalPlainTextPlugin",
   setup(__props) {
     const editor = useEditor();
     const showPlaceholder = useCanShowPlaceholder(editor);
     usePlainTextSetup(editor);
     return (_ctx, _cache) => {
-      return _openBlock3(), _createElementBlock2(
-        _Fragment,
-        null,
-        [
-          _unref2(showPlaceholder) ? _renderSlot3(_ctx.$slots, "placeholder", { key: 0 }) : _createCommentVNode2("v-if", true),
-          _renderSlot3(_ctx.$slots, "contentEditable"),
-          _createVNode(_unref2(LexicalDecoratedTeleports_default))
-        ],
-        64
-        /* STABLE_FRAGMENT */
-      );
+      return _openBlock3(), _createElementBlock2(_Fragment, null, [_unref2(showPlaceholder) ? _renderSlot3(_ctx.$slots, "placeholder", {
+        key: 0
+      }) : _createCommentVNode2("v-if", true), _renderSlot3(_ctx.$slots, "contentEditable"), _createVNode(_unref2(LexicalDecoratedTeleports_default))], 64
+      /* STABLE_FRAGMENT */);
     };
   }
 });
 
 // src/components/LexicalPlainTextPlugin.vue
-var LexicalPlainTextPlugin_default = /* @__PURE__ */ export_helper_default(LexicalPlainTextPlugin_vue_vue_type_script_setup_true_lang_default, [["__file", "/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalPlainTextPlugin.vue"]]);
+var LexicalPlainTextPlugin_default = /* @__PURE__ */export_helper_default(LexicalPlainTextPlugin_vue_vue_type_script_setup_true_lang_default, [["__file", "/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalPlainTextPlugin.vue"]]);
 
 // unplugin-vue:/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalComposer.vue?vue&type=script&setup=true&lang.ts
-import { defineComponent as _defineComponent5 } from "vue";
-import { renderSlot as _renderSlot4 } from "vue";
-import { onMounted as onMounted2, provide } from "vue";
-import { $createParagraphNode as $createParagraphNode2, $getRoot as $getRoot2, $getSelection as $getSelection6, createEditor } from "lexical";
-var LexicalComposer_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */ _defineComponent5({
+import _defaultImport55 from "vue";
+const _defineComponent5 = _defaultImport55.defineComponent;
+import _defaultImport56 from "vue";
+const _renderSlot4 = _defaultImport56.renderSlot;
+import _defaultImport57 from "vue";
+const provide = _defaultImport57.provide;
+const onMounted2 = _defaultImport57.onMounted;
+import _defaultImport58 from "lexical";
+const createEditor = _defaultImport58.createEditor;
+const $getSelection6 = _defaultImport58.$getSelection;
+const $getRoot2 = _defaultImport58.$getRoot;
+const $createParagraphNode2 = _defaultImport58.$createParagraphNode;
+var LexicalComposer_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */_defineComponent5({
   __name: "LexicalComposer",
   props: {
-    initialConfig: { type: Object, required: true }
+    initialConfig: {
+      type: Object,
+      required: true
+    }
   },
   emits: ["error"],
-  setup(__props, { emit }) {
+  setup(__props, {
+    emit
+  }) {
     const props = __props;
-    const HISTORY_MERGE_OPTIONS = { tag: "history-merge" };
+    const HISTORY_MERGE_OPTIONS = {
+      tag: "history-merge"
+    };
     const editor = createEditor({
       editable: false,
       namespace: props.initialConfig.namespace,
@@ -1599,8 +1534,7 @@ var LexicalComposer_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ *
     });
     initializeEditor2(editor, props.initialConfig.editorState);
     function initializeEditor2(editor2, initialEditorState) {
-      if (initialEditorState === null)
-        return;
+      if (initialEditorState === null) return;
       if (initialEditorState === void 0) {
         editor2.update(() => {
           const root = $getRoot2();
@@ -1608,29 +1542,30 @@ var LexicalComposer_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ *
             const paragraph = $createParagraphNode2();
             root.append(paragraph);
             const activeElement = document.activeElement;
-            if ($getSelection6() !== null || activeElement !== null && activeElement === editor2.getRootElement())
-              paragraph.select();
+            if ($getSelection6() !== null || activeElement !== null && activeElement === editor2.getRootElement()) paragraph.select();
           }
         }, HISTORY_MERGE_OPTIONS);
       } else if (initialEditorState !== null) {
         switch (typeof initialEditorState) {
-          case "string": {
-            const parsedEditorState = editor2.parseEditorState(initialEditorState);
-            editor2.setEditorState(parsedEditorState, HISTORY_MERGE_OPTIONS);
-            break;
-          }
-          case "object": {
-            editor2.setEditorState(initialEditorState, HISTORY_MERGE_OPTIONS);
-            break;
-          }
-          case "function": {
-            editor2.update(() => {
-              const root = $getRoot2();
-              if (root.isEmpty())
-                initialEditorState(editor2);
-            }, HISTORY_MERGE_OPTIONS);
-            break;
-          }
+          case "string":
+            {
+              const parsedEditorState = editor2.parseEditorState(initialEditorState);
+              editor2.setEditorState(parsedEditorState, HISTORY_MERGE_OPTIONS);
+              break;
+            }
+          case "object":
+            {
+              editor2.setEditorState(initialEditorState, HISTORY_MERGE_OPTIONS);
+              break;
+            }
+          case "function":
+            {
+              editor2.update(() => {
+                const root = $getRoot2();
+                if (root.isEmpty()) initialEditorState(editor2);
+              }, HISTORY_MERGE_OPTIONS);
+              break;
+            }
         }
       }
     }
@@ -1646,26 +1581,40 @@ var LexicalComposer_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ *
 });
 
 // src/components/LexicalComposer.vue
-var LexicalComposer_default = /* @__PURE__ */ export_helper_default(LexicalComposer_vue_vue_type_script_setup_true_lang_default, [["__file", "/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalComposer.vue"]]);
+var LexicalComposer_default = /* @__PURE__ */export_helper_default(LexicalComposer_vue_vue_type_script_setup_true_lang_default, [["__file", "/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalComposer.vue"]]);
 
 // unplugin-vue:/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalOnChangePlugin.vue?vue&type=script&setup=true&lang.ts
-import { defineComponent as _defineComponent6 } from "vue";
-var LexicalOnChangePlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */ _defineComponent6({
+import _defaultImport59 from "vue";
+const _defineComponent6 = _defaultImport59.defineComponent;
+var LexicalOnChangePlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */_defineComponent6({
   __name: "LexicalOnChangePlugin",
   props: {
-    ignoreInitialChange: { type: Boolean, required: false, default: true },
-    ignoreSelectionChange: { type: Boolean, required: false, default: false }
+    ignoreInitialChange: {
+      type: Boolean,
+      required: false,
+      default: true
+    },
+    ignoreSelectionChange: {
+      type: Boolean,
+      required: false,
+      default: false
+    }
   },
   emits: ["change"],
-  setup(__props, { emit }) {
+  setup(__props, {
+    emit
+  }) {
     const props = __props;
     const editor = useEditor();
     useMounted(() => {
-      return editor.registerUpdateListener(({ editorState, dirtyElements, dirtyLeaves, prevEditorState }) => {
-        if (props.ignoreSelectionChange && dirtyElements.size === 0 && dirtyLeaves.size === 0)
-          return;
-        if (props.ignoreInitialChange && prevEditorState.isEmpty())
-          return;
+      return editor.registerUpdateListener(({
+        editorState,
+        dirtyElements,
+        dirtyLeaves,
+        prevEditorState
+      }) => {
+        if (props.ignoreSelectionChange && dirtyElements.size === 0 && dirtyLeaves.size === 0) return;
+        if (props.ignoreInitialChange && prevEditorState.isEmpty()) return;
         emit("change", editorState, editor);
       });
     });
@@ -1676,14 +1625,18 @@ var LexicalOnChangePlugin_vue_vue_type_script_setup_true_lang_default = /* @__PU
 });
 
 // src/components/LexicalOnChangePlugin.vue
-var LexicalOnChangePlugin_default = /* @__PURE__ */ export_helper_default(LexicalOnChangePlugin_vue_vue_type_script_setup_true_lang_default, [["__file", "/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalOnChangePlugin.vue"]]);
+var LexicalOnChangePlugin_default = /* @__PURE__ */export_helper_default(LexicalOnChangePlugin_vue_vue_type_script_setup_true_lang_default, [["__file", "/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalOnChangePlugin.vue"]]);
 
 // unplugin-vue:/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalHistoryPlugin.vue?vue&type=script&setup=true&lang.ts
-import { defineComponent as _defineComponent7 } from "vue";
-var LexicalHistoryPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */ _defineComponent7({
+import _defaultImport60 from "vue";
+const _defineComponent7 = _defaultImport60.defineComponent;
+var LexicalHistoryPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */_defineComponent7({
   __name: "LexicalHistoryPlugin",
   props: {
-    externalHistoryState: { type: Object, required: false }
+    externalHistoryState: {
+      type: Object,
+      required: false
+    }
   },
   setup(__props) {
     const props = __props;
@@ -1696,41 +1649,65 @@ var LexicalHistoryPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PUR
 });
 
 // src/components/LexicalHistoryPlugin.vue
-var LexicalHistoryPlugin_default = /* @__PURE__ */ export_helper_default(LexicalHistoryPlugin_vue_vue_type_script_setup_true_lang_default, [["__file", "/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalHistoryPlugin.vue"]]);
+var LexicalHistoryPlugin_default = /* @__PURE__ */export_helper_default(LexicalHistoryPlugin_vue_vue_type_script_setup_true_lang_default, [["__file", "/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalHistoryPlugin.vue"]]);
 
 // unplugin-vue:/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalTreeViewPlugin.vue?vue&type=script&setup=true&lang.ts
-import { defineComponent as _defineComponent8 } from "vue";
-import { normalizeClass as _normalizeClass, openBlock as _openBlock4, createElementBlock as _createElementBlock3, createCommentVNode as _createCommentVNode3, toDisplayString as _toDisplayString, createElementVNode as _createElementVNode } from "vue";
-import { $isMarkNode } from "@lexical/mark";
-import {
-  $getRoot as $getRoot3,
-  $getSelection as $getSelection7,
-  $isElementNode as $isElementNode2,
-  $isRangeSelection as $isRangeSelection4,
-  $isTextNode as $isTextNode4,
-  DEPRECATED_$isGridSelection
-} from "lexical";
-import { computed as computed5, onUnmounted as onUnmounted2, ref as ref10, watchEffect as watchEffect2 } from "vue";
-import { $isLinkNode as $isLinkNode2 } from "@lexical/link";
+import _defaultImport61 from "vue";
+const _defineComponent8 = _defaultImport61.defineComponent;
+import _defaultImport62 from "vue";
+const _createElementVNode = _defaultImport62.createElementVNode;
+const _toDisplayString = _defaultImport62.toDisplayString;
+const _createCommentVNode3 = _defaultImport62.createCommentVNode;
+const _createElementBlock3 = _defaultImport62.createElementBlock;
+const _openBlock4 = _defaultImport62.openBlock;
+const _normalizeClass = _defaultImport62.normalizeClass;
+import _defaultImport63 from "@lexical/mark";
+const $isMarkNode = _defaultImport63.$isMarkNode;
+import _defaultImport64 from "lexical";
+const DEPRECATED_$isGridSelection = _defaultImport64.DEPRECATED_$isGridSelection;
+const $isTextNode4 = _defaultImport64.$isTextNode;
+const $isRangeSelection4 = _defaultImport64.$isRangeSelection;
+const $isElementNode2 = _defaultImport64.$isElementNode;
+const $getSelection7 = _defaultImport64.$getSelection;
+const $getRoot3 = _defaultImport64.$getRoot;
+import _defaultImport65 from "vue";
+const watchEffect2 = _defaultImport65.watchEffect;
+const ref10 = _defaultImport65.ref;
+const onUnmounted2 = _defaultImport65.onUnmounted;
+const computed5 = _defaultImport65.computed;
+import _defaultImport66 from "@lexical/link";
+const $isLinkNode2 = _defaultImport66.$isLinkNode;
 var _hoisted_12 = ["max"];
-var LexicalTreeViewPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */ _defineComponent8({
+var LexicalTreeViewPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */_defineComponent8({
   __name: "LexicalTreeViewPlugin",
   props: {
-    timeTravelButtonClassName: { type: String, required: true },
-    timeTravelPanelSliderClassName: { type: String, required: true },
-    timeTravelPanelButtonClassName: { type: String, required: true },
-    timeTravelPanelClassName: { type: String, required: true },
-    viewClassName: { type: String, required: true }
+    timeTravelButtonClassName: {
+      type: String,
+      required: true
+    },
+    timeTravelPanelSliderClassName: {
+      type: String,
+      required: true
+    },
+    timeTravelPanelButtonClassName: {
+      type: String,
+      required: true
+    },
+    timeTravelPanelClassName: {
+      type: String,
+      required: true
+    },
+    viewClassName: {
+      type: String,
+      required: true
+    }
   },
   setup(__props) {
     const NON_SINGLE_WIDTH_CHARS_REPLACEMENT = Object.freeze({
       "	": "\\t",
       "\n": "\\n"
     });
-    const NON_SINGLE_WIDTH_CHARS_REGEX = new RegExp(
-      Object.keys(NON_SINGLE_WIDTH_CHARS_REPLACEMENT).join("|"),
-      "g"
-    );
+    const NON_SINGLE_WIDTH_CHARS_REGEX = new RegExp(Object.keys(NON_SINGLE_WIDTH_CHARS_REPLACEMENT).join("|"), "g");
     const SYMBOLS = Object.freeze({
       ancestorHasNextSibling: "|",
       ancestorIsLastChild: " ",
@@ -1771,9 +1748,7 @@ var LexicalTreeViewPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PU
           const typeDisplay = node.getType() || "";
           const isSelected = node.isSelected();
           const idsDisplay = $isMarkNode(node) ? ` id: [ ${node.getIDs().join(", ")} ] ` : "";
-          res += `${isSelected ? SYMBOLS.selectedLine : " "} ${indent.join(
-            " "
-          )} ${nodeKeyDisplay} ${typeDisplay} ${idsDisplay} ${printNode(node)}
+          res += `${isSelected ? SYMBOLS.selectedLine : " "} ${indent.join(" ")} ${nodeKeyDisplay} ${typeDisplay} ${idsDisplay} ${printNode(node)}
 `;
           res += printSelectedCharsLine({
             indent,
@@ -1793,28 +1768,14 @@ var LexicalTreeViewPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PU
       const childNodes = currentNode.getChildren();
       const childNodesLength = childNodes.length;
       childNodes.forEach((childNode, i) => {
-        visitor(
-          childNode,
-          indent.concat(
-            i === childNodesLength - 1 ? SYMBOLS.isLastChild : SYMBOLS.hasNextSibling
-          )
-        );
+        visitor(childNode, indent.concat(i === childNodesLength - 1 ? SYMBOLS.isLastChild : SYMBOLS.hasNextSibling));
         if ($isElementNode2(childNode)) {
-          visitTree(
-            childNode,
-            visitor,
-            indent.concat(
-              i === childNodesLength - 1 ? SYMBOLS.ancestorIsLastChild : SYMBOLS.ancestorHasNextSibling
-            )
-          );
+          visitTree(childNode, visitor, indent.concat(i === childNodesLength - 1 ? SYMBOLS.ancestorIsLastChild : SYMBOLS.ancestorHasNextSibling));
         }
       });
     }
     function normalize(text) {
-      return Object.entries(NON_SINGLE_WIDTH_CHARS_REPLACEMENT).reduce(
-        (acc, [key, value]) => acc.replace(new RegExp(key, "g"), String(value)),
-        text
-      );
+      return Object.entries(NON_SINGLE_WIDTH_CHARS_REPLACEMENT).reduce((acc, [key, value]) => acc.replace(new RegExp(key, "g"), String(value)), text);
     }
     function printNode(node) {
       if ($isTextNode4(node)) {
@@ -1831,61 +1792,38 @@ var LexicalTreeViewPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PU
         return "";
       }
     }
-    const FORMAT_PREDICATES = [
-      (node) => node.hasFormat("bold") && "Bold",
-      (node) => node.hasFormat("code") && "Code",
-      (node) => node.hasFormat("italic") && "Italic",
-      (node) => node.hasFormat("strikethrough") && "Strikethrough",
-      (node) => node.hasFormat("subscript") && "Subscript",
-      (node) => node.hasFormat("superscript") && "Superscript",
-      (node) => node.hasFormat("underline") && "Underline"
-    ];
-    const DETAIL_PREDICATES = [
-      (node) => node.isDirectionless() && "Directionless",
-      (node) => node.isUnmergeable() && "Unmergeable"
-    ];
-    const MODE_PREDICATES = [
-      (node) => node.isToken() && "Token",
-      (node) => node.isSegmented() && "Segmented"
-    ];
+    const FORMAT_PREDICATES = [node => node.hasFormat("bold") && "Bold", node => node.hasFormat("code") && "Code", node => node.hasFormat("italic") && "Italic", node => node.hasFormat("strikethrough") && "Strikethrough", node => node.hasFormat("subscript") && "Subscript", node => node.hasFormat("superscript") && "Superscript", node => node.hasFormat("underline") && "Underline"];
+    const DETAIL_PREDICATES = [node => node.isDirectionless() && "Directionless", node => node.isUnmergeable() && "Unmergeable"];
+    const MODE_PREDICATES = [node => node.isToken() && "Token", node => node.isSegmented() && "Segmented"];
     function printAllTextNodeProperties(node) {
-      return [
-        printFormatProperties(node),
-        printDetailProperties(node),
-        printModeProperties(node)
-      ].filter(Boolean).join(", ");
+      return [printFormatProperties(node), printDetailProperties(node), printModeProperties(node)].filter(Boolean).join(", ");
     }
     function printAllLinkNodeProperties(node) {
       return [printTargetProperties(node), printRelProperties(node)].filter(Boolean).join(", ");
     }
     function printDetailProperties(nodeOrSelection) {
-      let str = DETAIL_PREDICATES.map((predicate) => predicate(nodeOrSelection)).filter(Boolean).join(", ").toLocaleLowerCase();
-      if (str !== "")
-        str = `detail: ${str}`;
+      let str = DETAIL_PREDICATES.map(predicate => predicate(nodeOrSelection)).filter(Boolean).join(", ").toLocaleLowerCase();
+      if (str !== "") str = `detail: ${str}`;
       return str;
     }
     function printModeProperties(nodeOrSelection) {
-      let str = MODE_PREDICATES.map((predicate) => predicate(nodeOrSelection)).filter(Boolean).join(", ").toLocaleLowerCase();
-      if (str !== "")
-        str = `mode: ${str}`;
+      let str = MODE_PREDICATES.map(predicate => predicate(nodeOrSelection)).filter(Boolean).join(", ").toLocaleLowerCase();
+      if (str !== "") str = `mode: ${str}`;
       return str;
     }
     function printFormatProperties(nodeOrSelection) {
-      let str = FORMAT_PREDICATES.map((predicate) => predicate(nodeOrSelection)).filter(Boolean).join(", ").toLocaleLowerCase();
-      if (str !== "")
-        str = `format: ${str}`;
+      let str = FORMAT_PREDICATES.map(predicate => predicate(nodeOrSelection)).filter(Boolean).join(", ").toLocaleLowerCase();
+      if (str !== "") str = `format: ${str}`;
       return str;
     }
     function printTargetProperties(node) {
       let str = node.getTarget();
-      if (str != null)
-        str = `target: ${str}`;
+      if (str != null) str = `target: ${str}`;
       return str;
     }
     function printRelProperties(node) {
       let str = node.getRel();
-      if (str != null)
-        str = `rel: ${str}`;
+      if (str != null) str = `rel: ${str}`;
       return str;
     }
     function printSelectedCharsLine({
@@ -1896,31 +1834,19 @@ var LexicalTreeViewPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PU
       selection,
       typeDisplay
     }) {
-      if (!$isTextNode4(node) || !$isRangeSelection4(selection) || !isSelected || $isElementNode2(node))
-        return "";
+      if (!$isTextNode4(node) || !$isRangeSelection4(selection) || !isSelected || $isElementNode2(node)) return "";
       const anchor = selection.anchor;
       const focus = selection.focus;
-      if (node.getTextContent() === "" || anchor.getNode() === selection.focus.getNode() && anchor.offset === focus.offset)
-        return "";
+      if (node.getTextContent() === "" || anchor.getNode() === selection.focus.getNode() && anchor.offset === focus.offset) return "";
       const [start, end] = $getSelectionStartEnd(node, selection);
-      if (start === end)
-        return "";
+      if (start === end) return "";
       const selectionLastIndent = indent[indent.length - 1] === SYMBOLS.hasNextSibling ? SYMBOLS.ancestorHasNextSibling : SYMBOLS.ancestorIsLastChild;
-      const indentionChars = [
-        ...indent.slice(0, indent.length - 1),
-        selectionLastIndent
-      ];
+      const indentionChars = [...indent.slice(0, indent.length - 1), selectionLastIndent];
       const unselectedChars = Array(start + 1).fill(" ");
       const selectedChars = Array(end - start).fill(SYMBOLS.selectedChar);
       const paddingLength = typeDisplay.length + 3;
-      const nodePrintSpaces = Array(nodeKeyDisplay.length + paddingLength).fill(
-        " "
-      );
-      return `${[
-        SYMBOLS.selectedLine,
-        indentionChars.join(" "),
-        [...nodePrintSpaces, ...unselectedChars, ...selectedChars].join("")
-      ].join(" ")}
+      const nodePrintSpaces = Array(nodeKeyDisplay.length + paddingLength).fill(" ");
+      return `${[SYMBOLS.selectedLine, indentionChars.join(" "), [...nodePrintSpaces, ...unselectedChars, ...selectedChars].join("")].join(" ")}
 `;
     }
     function $getSelectionStartEnd(node, selection) {
@@ -1945,10 +1871,7 @@ var LexicalTreeViewPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PU
       }
       const numNonSingleWidthCharBeforeSelection = (textContent.slice(0, start).match(NON_SINGLE_WIDTH_CHARS_REGEX) || []).length;
       const numNonSingleWidthCharInSelection = (textContent.slice(start, end).match(NON_SINGLE_WIDTH_CHARS_REGEX) || []).length;
-      return [
-        start + numNonSingleWidthCharBeforeSelection,
-        end + numNonSingleWidthCharBeforeSelection + numNonSingleWidthCharInSelection
-      ];
+      return [start + numNonSingleWidthCharBeforeSelection, end + numNonSingleWidthCharBeforeSelection + numNonSingleWidthCharInSelection];
     }
     const editor = useEditor();
     const timeStampedEditorStates = ref10([]);
@@ -1959,18 +1882,17 @@ var LexicalTreeViewPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PU
     const inputRef = ref10(null);
     const isPlaying = ref10(false);
     let unregisterListener;
-    watchEffect2((onInvalidate) => {
+    watchEffect2(onInvalidate => {
       content.value = generateContent(editor.getEditorState());
-      unregisterListener = editor.registerUpdateListener(({ editorState }) => {
+      unregisterListener = editor.registerUpdateListener(({
+        editorState
+      }) => {
         const compositionKey = editor._compositionKey;
         const treeText = generateContent(editor.getEditorState());
         const compositionText = compositionKey !== null && `Composition key: ${compositionKey}`;
         content.value = [treeText, compositionText].filter(Boolean).join("\n\n");
         if (!timeTravelEnabled.value) {
-          timeStampedEditorStates.value = [
-            ...timeStampedEditorStates.value,
-            [Date.now(), editorState]
-          ];
+          timeStampedEditorStates.value = [...timeStampedEditorStates.value, [Date.now(), editorState]];
         }
       });
       onInvalidate(() => {
@@ -1979,7 +1901,7 @@ var LexicalTreeViewPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PU
     });
     const totalEditorStates = computed5(() => timeStampedEditorStates.value.length);
     let timeoutId;
-    watchEffect2((onInvalidate) => {
+    watchEffect2(onInvalidate => {
       if (isPlaying.value) {
         const play = () => {
           const currentIndex = playingIndexRef.value;
@@ -1994,8 +1916,7 @@ var LexicalTreeViewPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PU
             playingIndexRef.value++;
             const index = playingIndexRef.value;
             const input = inputRef.value;
-            if (input)
-              input.value = String(index);
+            if (input) input.value = String(index);
             editor.setEditorState(timeStampedEditorStates.value[index][1]);
             play();
           }, timeDiff);
@@ -2044,114 +1965,82 @@ var LexicalTreeViewPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PU
         const timeStampedEditorState = timeStampedEditorStates.value[index];
         editor.setEditorState(timeStampedEditorState[1]);
         const input = inputRef.value;
-        if (input)
-          input.value = String(index);
+        if (input) input.value = String(index);
         timeTravelEnabled.value = false;
         isPlaying.value = false;
       }
     }
     return (_ctx, _cache) => {
-      return _openBlock4(), _createElementBlock3(
-        "div",
-        {
-          class: _normalizeClass(_ctx.viewClassName)
-        },
-        [
-          !timeTravelEnabled.value && totalEditorStates.value > 2 ? (_openBlock4(), _createElementBlock3(
-            "button",
-            {
-              key: 0,
-              class: _normalizeClass(_ctx.timeTravelButtonClassName),
-              onClick: enableTimeTravel
-            },
-            " Time Travel ",
-            2
-            /* CLASS */
-          )) : _createCommentVNode3("v-if", true),
-          _createElementVNode(
-            "pre",
-            {
-              ref_key: "treeElementRef",
-              ref: treeElementRef
-            },
-            _toDisplayString(content.value),
-            513
-            /* TEXT, NEED_PATCH */
-          ),
-          timeTravelEnabled.value ? (_openBlock4(), _createElementBlock3(
-            "div",
-            {
-              key: 1,
-              class: _normalizeClass(_ctx.timeTravelPanelClassName)
-            },
-            [
-              _createElementVNode(
-                "button",
-                {
-                  class: _normalizeClass(_ctx.timeTravelPanelButtonClassName),
-                  onClick: _cache[0] || (_cache[0] = ($event) => isPlaying.value = !isPlaying.value)
-                },
-                _toDisplayString(isPlaying.value ? "Pause" : "Play"),
-                3
-                /* TEXT, CLASS */
-              ),
-              _createElementVNode("input", {
-                ref_key: "inputRef",
-                ref: inputRef,
-                class: _normalizeClass(_ctx.timeTravelPanelSliderClassName),
-                type: "range",
-                min: "1",
-                max: totalEditorStates.value - 1,
-                onInput: updateEditorState
-              }, null, 42, _hoisted_12),
-              _createElementVNode(
-                "button",
-                {
-                  class: _normalizeClass(_ctx.timeTravelPanelButtonClassName),
-                  onClick: exit
-                },
-                " Exit ",
-                2
-                /* CLASS */
-              )
-            ],
-            2
-            /* CLASS */
-          )) : _createCommentVNode3("v-if", true)
-        ],
-        2
-        /* CLASS */
-      );
+      return _openBlock4(), _createElementBlock3("div", {
+        class: _normalizeClass(_ctx.viewClassName)
+      }, [!timeTravelEnabled.value && totalEditorStates.value > 2 ? (_openBlock4(), _createElementBlock3("button", {
+        key: 0,
+        class: _normalizeClass(_ctx.timeTravelButtonClassName),
+        onClick: enableTimeTravel
+      }, " Time Travel ", 2
+      /* CLASS */)) : _createCommentVNode3("v-if", true), _createElementVNode("pre", {
+        ref_key: "treeElementRef",
+        ref: treeElementRef
+      }, _toDisplayString(content.value), 513
+      /* TEXT, NEED_PATCH */), timeTravelEnabled.value ? (_openBlock4(), _createElementBlock3("div", {
+        key: 1,
+        class: _normalizeClass(_ctx.timeTravelPanelClassName)
+      }, [_createElementVNode("button", {
+        class: _normalizeClass(_ctx.timeTravelPanelButtonClassName),
+        onClick: _cache[0] || (_cache[0] = $event => isPlaying.value = !isPlaying.value)
+      }, _toDisplayString(isPlaying.value ? "Pause" : "Play"), 3
+      /* TEXT, CLASS */), _createElementVNode("input", {
+        ref_key: "inputRef",
+        ref: inputRef,
+        class: _normalizeClass(_ctx.timeTravelPanelSliderClassName),
+        type: "range",
+        min: "1",
+        max: totalEditorStates.value - 1,
+        onInput: updateEditorState
+      }, null, 42, _hoisted_12), _createElementVNode("button", {
+        class: _normalizeClass(_ctx.timeTravelPanelButtonClassName),
+        onClick: exit
+      }, " Exit ", 2
+      /* CLASS */)], 2
+      /* CLASS */)) : _createCommentVNode3("v-if", true)], 2
+      /* CLASS */);
     };
   }
 });
 
 // src/components/LexicalTreeViewPlugin.vue
-var LexicalTreeViewPlugin_default = /* @__PURE__ */ export_helper_default(LexicalTreeViewPlugin_vue_vue_type_script_setup_true_lang_default, [["__file", "/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalTreeViewPlugin.vue"]]);
+var LexicalTreeViewPlugin_default = /* @__PURE__ */export_helper_default(LexicalTreeViewPlugin_vue_vue_type_script_setup_true_lang_default, [["__file", "/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalTreeViewPlugin.vue"]]);
 
 // unplugin-vue:/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalAutoFocusPlugin.vue?vue&type=script&setup=true&lang.ts
-import { defineComponent as _defineComponent9 } from "vue";
-import { nextTick, onMounted as onMounted3 } from "vue";
-var LexicalAutoFocusPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */ _defineComponent9({
+import _defaultImport67 from "vue";
+const _defineComponent9 = _defaultImport67.defineComponent;
+import _defaultImport68 from "vue";
+const onMounted3 = _defaultImport68.onMounted;
+const nextTick = _defaultImport68.nextTick;
+var LexicalAutoFocusPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */_defineComponent9({
   __name: "LexicalAutoFocusPlugin",
   props: {
-    defaultSelection: { type: String, required: false }
+    defaultSelection: {
+      type: String,
+      required: false
+    }
   },
   setup(__props) {
     const props = __props;
     const editor = useEditor();
     onMounted3(() => {
       nextTick(() => {
-        editor.focus(
-          () => {
-            const activeElement = document.activeElement;
-            const rootElement = editor.getRootElement();
-            if (rootElement !== null && (activeElement === null || !rootElement.contains(activeElement))) {
-              rootElement.focus({ preventScroll: true });
-            }
-          },
-          { defaultSelection: props.defaultSelection }
-        );
+        editor.focus(() => {
+          const activeElement = document.activeElement;
+          const rootElement = editor.getRootElement();
+          if (rootElement !== null && (activeElement === null || !rootElement.contains(activeElement))) {
+            rootElement.focus({
+              preventScroll: true
+            });
+          }
+        }, {
+          defaultSelection: props.defaultSelection
+        });
       });
     });
     return (_ctx, _cache) => {
@@ -2161,39 +2050,41 @@ var LexicalAutoFocusPlugin_vue_vue_type_script_setup_true_lang_default = /* @__P
 });
 
 // src/components/LexicalAutoFocusPlugin.vue
-var LexicalAutoFocusPlugin_default = /* @__PURE__ */ export_helper_default(LexicalAutoFocusPlugin_vue_vue_type_script_setup_true_lang_default, [["__file", "/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalAutoFocusPlugin.vue"]]);
+var LexicalAutoFocusPlugin_default = /* @__PURE__ */export_helper_default(LexicalAutoFocusPlugin_vue_vue_type_script_setup_true_lang_default, [["__file", "/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalAutoFocusPlugin.vue"]]);
 
 // unplugin-vue:/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalRichTextPlugin.vue?vue&type=script&setup=true&lang.ts
-import { defineComponent as _defineComponent10 } from "vue";
-import { unref as _unref3, renderSlot as _renderSlot5, createCommentVNode as _createCommentVNode4, createVNode as _createVNode2, Fragment as _Fragment2, openBlock as _openBlock5, createElementBlock as _createElementBlock4 } from "vue";
-var LexicalRichTextPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */ _defineComponent10({
+import _defaultImport69 from "vue";
+const _defineComponent10 = _defaultImport69.defineComponent;
+import _defaultImport70 from "vue";
+const _createElementBlock4 = _defaultImport70.createElementBlock;
+const _openBlock5 = _defaultImport70.openBlock;
+const _Fragment2 = _defaultImport70.Fragment;
+const _createVNode2 = _defaultImport70.createVNode;
+const _createCommentVNode4 = _defaultImport70.createCommentVNode;
+const _renderSlot5 = _defaultImport70.renderSlot;
+const _unref3 = _defaultImport70.unref;
+var LexicalRichTextPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */_defineComponent10({
   __name: "LexicalRichTextPlugin",
   setup(__props) {
     const editor = useEditor();
     const showPlaceholder = useCanShowPlaceholder(editor);
     useRichTextSetup(editor);
     return (_ctx, _cache) => {
-      return _openBlock5(), _createElementBlock4(
-        _Fragment2,
-        null,
-        [
-          _unref3(showPlaceholder) ? _renderSlot5(_ctx.$slots, "placeholder", { key: 0 }) : _createCommentVNode4("v-if", true),
-          _renderSlot5(_ctx.$slots, "contentEditable"),
-          _createVNode2(_unref3(LexicalDecoratedTeleports_default))
-        ],
-        64
-        /* STABLE_FRAGMENT */
-      );
+      return _openBlock5(), _createElementBlock4(_Fragment2, null, [_unref3(showPlaceholder) ? _renderSlot5(_ctx.$slots, "placeholder", {
+        key: 0
+      }) : _createCommentVNode4("v-if", true), _renderSlot5(_ctx.$slots, "contentEditable"), _createVNode2(_unref3(LexicalDecoratedTeleports_default))], 64
+      /* STABLE_FRAGMENT */);
     };
   }
 });
 
 // src/components/LexicalRichTextPlugin.vue
-var LexicalRichTextPlugin_default = /* @__PURE__ */ export_helper_default(LexicalRichTextPlugin_vue_vue_type_script_setup_true_lang_default, [["__file", "/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalRichTextPlugin.vue"]]);
+var LexicalRichTextPlugin_default = /* @__PURE__ */export_helper_default(LexicalRichTextPlugin_vue_vue_type_script_setup_true_lang_default, [["__file", "/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalRichTextPlugin.vue"]]);
 
 // unplugin-vue:/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalListPlugin.vue?vue&type=script&setup=true&lang.ts
-import { defineComponent as _defineComponent11 } from "vue";
-var LexicalListPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */ _defineComponent11({
+import _defaultImport71 from "vue";
+const _defineComponent11 = _defaultImport71.defineComponent;
+var LexicalListPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */_defineComponent11({
   __name: "LexicalListPlugin",
   setup(__props) {
     const editor = useEditor();
@@ -2205,17 +2096,23 @@ var LexicalListPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__
 });
 
 // src/components/LexicalListPlugin.vue
-var LexicalListPlugin_default = /* @__PURE__ */ export_helper_default(LexicalListPlugin_vue_vue_type_script_setup_true_lang_default, [["__file", "/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalListPlugin.vue"]]);
+var LexicalListPlugin_default = /* @__PURE__ */export_helper_default(LexicalListPlugin_vue_vue_type_script_setup_true_lang_default, [["__file", "/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalListPlugin.vue"]]);
 
 // unplugin-vue:/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalAutoLinkPlugin.vue?vue&type=script&setup=true&lang.ts
-import { defineComponent as _defineComponent12 } from "vue";
-var LexicalAutoLinkPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */ _defineComponent12({
+import _defaultImport72 from "vue";
+const _defineComponent12 = _defaultImport72.defineComponent;
+var LexicalAutoLinkPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */_defineComponent12({
   __name: "LexicalAutoLinkPlugin",
   props: {
-    matchers: { type: Array, required: true }
+    matchers: {
+      type: Array,
+      required: true
+    }
   },
   emits: ["change"],
-  setup(__props, { emit }) {
+  setup(__props, {
+    emit
+  }) {
     const props = __props;
     const editor = useEditor();
     useAutoLink(editor, props.matchers, (url, prevUrl) => {
@@ -2231,38 +2128,39 @@ var LexicalAutoLinkPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PU
 });
 
 // src/components/LexicalAutoLinkPlugin.vue
-var LexicalAutoLinkPlugin_default = /* @__PURE__ */ export_helper_default(LexicalAutoLinkPlugin_vue_vue_type_script_setup_true_lang_default, [["__file", "/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalAutoLinkPlugin.vue"]]);
+var LexicalAutoLinkPlugin_default = /* @__PURE__ */export_helper_default(LexicalAutoLinkPlugin_vue_vue_type_script_setup_true_lang_default, [["__file", "/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalAutoLinkPlugin.vue"]]);
 
 // unplugin-vue:/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalLinkPlugin.vue?vue&type=script&setup=true&lang.ts
-import { defineComponent as _defineComponent13 } from "vue";
-import {
-  LinkNode,
-  TOGGLE_LINK_COMMAND,
-  toggleLink
-} from "@lexical/link";
-import {
-  COMMAND_PRIORITY_EDITOR as COMMAND_PRIORITY_EDITOR2
-} from "lexical";
-var LexicalLinkPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */ _defineComponent13({
+import _defaultImport73 from "vue";
+const _defineComponent13 = _defaultImport73.defineComponent;
+import _defaultImport74 from "@lexical/link";
+const toggleLink = _defaultImport74.toggleLink;
+const TOGGLE_LINK_COMMAND = _defaultImport74.TOGGLE_LINK_COMMAND;
+const LinkNode = _defaultImport74.LinkNode;
+import _defaultImport75 from "lexical";
+const COMMAND_PRIORITY_EDITOR2 = _defaultImport75.COMMAND_PRIORITY_EDITOR;
+var LexicalLinkPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */_defineComponent13({
   __name: "LexicalLinkPlugin",
   setup(__props) {
     const editor = useEditor();
     useMounted(() => {
-      if (!editor.hasNodes([LinkNode]))
-        throw new Error("LinkPlugin: LinkNode not registered on editor");
-      return editor.registerCommand(
-        TOGGLE_LINK_COMMAND,
-        (payload) => {
-          if (typeof payload === "string" || payload === null) {
-            toggleLink(payload);
-          } else {
-            const { url, target, rel } = payload;
-            toggleLink(url, { rel, target });
-          }
-          return true;
-        },
-        COMMAND_PRIORITY_EDITOR2
-      );
+      if (!editor.hasNodes([LinkNode])) throw new Error("LinkPlugin: LinkNode not registered on editor");
+      return editor.registerCommand(TOGGLE_LINK_COMMAND, payload => {
+        if (typeof payload === "string" || payload === null) {
+          toggleLink(payload);
+        } else {
+          const {
+            url,
+            target,
+            rel
+          } = payload;
+          toggleLink(url, {
+            rel,
+            target
+          });
+        }
+        return true;
+      }, COMMAND_PRIORITY_EDITOR2);
     });
     return (_ctx, _cache) => {
       return null;
@@ -2271,138 +2169,124 @@ var LexicalLinkPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__
 });
 
 // src/components/LexicalLinkPlugin.vue
-var LexicalLinkPlugin_default = /* @__PURE__ */ export_helper_default(LexicalLinkPlugin_vue_vue_type_script_setup_true_lang_default, [["__file", "/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalLinkPlugin.vue"]]);
+var LexicalLinkPlugin_default = /* @__PURE__ */export_helper_default(LexicalLinkPlugin_vue_vue_type_script_setup_true_lang_default, [["__file", "/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalLinkPlugin.vue"]]);
 
 // unplugin-vue:/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalTablePlugin.vue?vue&type=script&setup=true&lang.ts
-import { defineComponent as _defineComponent14 } from "vue";
-import {
-  $createTableCellNode,
-  $createTableNodeWithDimensions,
-  $isTableNode,
-  INSERT_TABLE_COMMAND,
-  TableCellNode,
-  TableNode,
-  TableRowNode,
-  applyTableHandlers
-} from "@lexical/table";
-import {
-  $getNodeByKey as $getNodeByKey2,
-  $isTextNode as $isTextNode5,
-  $nodesOfType,
-  COMMAND_PRIORITY_EDITOR as COMMAND_PRIORITY_EDITOR3,
-  DEPRECATED_$computeGridMap,
-  DEPRECATED_$getNodeTriplet,
-  DEPRECATED_$isGridRowNode
-} from "lexical";
-import { $insertNodeToNearestRoot } from "@lexical/utils";
-var LexicalTablePlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */ _defineComponent14({
+import _defaultImport76 from "vue";
+const _defineComponent14 = _defaultImport76.defineComponent;
+import _defaultImport77 from "@lexical/table";
+const applyTableHandlers = _defaultImport77.applyTableHandlers;
+const TableRowNode = _defaultImport77.TableRowNode;
+const TableNode = _defaultImport77.TableNode;
+const TableCellNode = _defaultImport77.TableCellNode;
+const INSERT_TABLE_COMMAND = _defaultImport77.INSERT_TABLE_COMMAND;
+const $isTableNode = _defaultImport77.$isTableNode;
+const $createTableNodeWithDimensions = _defaultImport77.$createTableNodeWithDimensions;
+const $createTableCellNode = _defaultImport77.$createTableCellNode;
+import _defaultImport78 from "lexical";
+const DEPRECATED_$isGridRowNode = _defaultImport78.DEPRECATED_$isGridRowNode;
+const DEPRECATED_$getNodeTriplet = _defaultImport78.DEPRECATED_$getNodeTriplet;
+const DEPRECATED_$computeGridMap = _defaultImport78.DEPRECATED_$computeGridMap;
+const COMMAND_PRIORITY_EDITOR3 = _defaultImport78.COMMAND_PRIORITY_EDITOR;
+const $nodesOfType = _defaultImport78.$nodesOfType;
+const $isTextNode5 = _defaultImport78.$isTextNode;
+const $getNodeByKey2 = _defaultImport78.$getNodeByKey;
+import _defaultImport79 from "@lexical/utils";
+const $insertNodeToNearestRoot = _defaultImport79.$insertNodeToNearestRoot;
+var LexicalTablePlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */_defineComponent14({
   __name: "LexicalTablePlugin",
   props: {
-    hasCellMerge: { type: Boolean, required: false, default: true },
-    hasCellBackgroundColor: { type: Boolean, required: false, default: true },
-    hasTabHandler: { type: Boolean, required: false, default: true }
+    hasCellMerge: {
+      type: Boolean,
+      required: false,
+      default: true
+    },
+    hasCellBackgroundColor: {
+      type: Boolean,
+      required: false,
+      default: true
+    },
+    hasTabHandler: {
+      type: Boolean,
+      required: false,
+      default: true
+    }
   },
   setup(__props) {
     const props = __props;
     const editor = useEditor();
     function $insertFirst(parent, node) {
       const firstChild = parent.getFirstChild();
-      if (firstChild !== null)
-        firstChild.insertBefore(node);
-      else
-        parent.append(node);
+      if (firstChild !== null) firstChild.insertBefore(node);else parent.append(node);
     }
     useMounted(() => {
       if (!editor.hasNodes([TableNode, TableCellNode, TableRowNode])) {
-        throw new Error(
-          "TablePlugin: TableNode, TableCellNode or TableRowNode not registered on editor"
-        );
+        throw new Error("TablePlugin: TableNode, TableCellNode or TableRowNode not registered on editor");
       }
-      return editor.registerCommand(
-        INSERT_TABLE_COMMAND,
-        ({ columns, rows, includeHeaders }) => {
-          const tableNode = $createTableNodeWithDimensions(
-            Number(rows),
-            Number(columns),
-            includeHeaders
-          );
-          $insertNodeToNearestRoot(tableNode);
-          const firstDescendant = tableNode.getFirstDescendant();
-          if ($isTextNode5(firstDescendant))
-            firstDescendant.select();
-          return true;
-        },
-        COMMAND_PRIORITY_EDITOR3
-      );
+      return editor.registerCommand(INSERT_TABLE_COMMAND, ({
+        columns,
+        rows,
+        includeHeaders
+      }) => {
+        const tableNode = $createTableNodeWithDimensions(Number(rows), Number(columns), includeHeaders);
+        $insertNodeToNearestRoot(tableNode);
+        const firstDescendant = tableNode.getFirstDescendant();
+        if ($isTextNode5(firstDescendant)) firstDescendant.select();
+        return true;
+      }, COMMAND_PRIORITY_EDITOR3);
     });
     useMounted(() => {
-      const tableSelections = /* @__PURE__ */ new Map();
-      const initializeTableNode = (tableNode) => {
+      const tableSelections = /* @__PURE__ */new Map();
+      const initializeTableNode = tableNode => {
         const nodeKey = tableNode.getKey();
-        const tableElement = editor.getElementByKey(
-          nodeKey
-        );
+        const tableElement = editor.getElementByKey(nodeKey);
         if (tableElement && !tableSelections.has(nodeKey)) {
-          const tableSelection = applyTableHandlers(
-            tableNode,
-            tableElement,
-            editor,
-            props.hasTabHandler
-          );
+          const tableSelection = applyTableHandlers(tableNode, tableElement, editor, props.hasTabHandler);
           tableSelections.set(nodeKey, tableSelection);
         }
       };
       editor.getEditorState().read(() => {
         const tableNodes = $nodesOfType(TableNode);
         for (const tableNode of tableNodes) {
-          if ($isTableNode(tableNode))
-            initializeTableNode(tableNode);
+          if ($isTableNode(tableNode)) initializeTableNode(tableNode);
         }
       });
-      const unregisterMutationListener = editor.registerMutationListener(
-        TableNode,
-        (nodeMutations) => {
-          for (const [nodeKey, mutation] of nodeMutations) {
-            if (mutation === "created") {
-              editor.getEditorState().read(() => {
-                const tableNode = $getNodeByKey2(nodeKey);
-                if ($isTableNode(tableNode))
-                  initializeTableNode(tableNode);
-              });
-            } else if (mutation === "destroyed") {
-              const tableSelection = tableSelections.get(nodeKey);
-              if (tableSelection !== void 0) {
-                tableSelection.removeListeners();
-                tableSelections.delete(nodeKey);
-              }
+      const unregisterMutationListener = editor.registerMutationListener(TableNode, nodeMutations => {
+        for (const [nodeKey, mutation] of nodeMutations) {
+          if (mutation === "created") {
+            editor.getEditorState().read(() => {
+              const tableNode = $getNodeByKey2(nodeKey);
+              if ($isTableNode(tableNode)) initializeTableNode(tableNode);
+            });
+          } else if (mutation === "destroyed") {
+            const tableSelection = tableSelections.get(nodeKey);
+            if (tableSelection !== void 0) {
+              tableSelection.removeListeners();
+              tableSelections.delete(nodeKey);
             }
           }
         }
-      );
+      });
       return () => {
         unregisterMutationListener();
-        for (const [, tableSelection] of tableSelections)
-          tableSelection.removeListeners();
+        for (const [, tableSelection] of tableSelections) tableSelection.removeListeners();
       };
     });
     useEffect(() => {
-      if (props.hasCellMerge)
-        return;
-      return editor.registerNodeTransform(TableCellNode, (node) => {
+      if (props.hasCellMerge) return;
+      return editor.registerNodeTransform(TableCellNode, node => {
         if (node.getColSpan() > 1 || node.getRowSpan() > 1) {
-          const [, , gridNode] = DEPRECATED_$getNodeTriplet(node);
+          const [,, gridNode] = DEPRECATED_$getNodeTriplet(node);
           const [gridMap] = DEPRECATED_$computeGridMap(gridNode, node, node);
           const rowsCount = gridMap.length;
           const columnsCount = gridMap[0].length;
           let row = gridNode.getFirstChild();
-          if (DEPRECATED_$isGridRowNode(row))
-            throw new Error("Expected TableNode first child to be a RowNode");
+          if (DEPRECATED_$isGridRowNode(row)) throw new Error("Expected TableNode first child to be a RowNode");
           const unmerged = [];
           for (let i = 0; i < rowsCount; i++) {
             if (i !== 0) {
               row = row.getNextSibling();
-              if (DEPRECATED_$isGridRowNode(row))
-                throw new Error("Expected TableNode first child to be a RowNode");
+              if (DEPRECATED_$isGridRowNode(row)) throw new Error("Expected TableNode first child to be a RowNode");
             }
             let lastRowCell = null;
             for (let j = 0; j < columnsCount; j++) {
@@ -2413,10 +2297,7 @@ var LexicalTablePlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE_
                 unmerged.push(cell);
               } else if (cell.getColSpan() > 1 || cell.getRowSpan() > 1) {
                 const newCell = $createTableCellNode(cell.__headerState);
-                if (lastRowCell !== null)
-                  lastRowCell.insertAfter(newCell);
-                else
-                  $insertFirst(row, newCell);
+                if (lastRowCell !== null) lastRowCell.insertAfter(newCell);else $insertFirst(row, newCell);
               }
             }
           }
@@ -2428,11 +2309,9 @@ var LexicalTablePlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE_
       });
     });
     useEffect(() => {
-      if (props.hasCellBackgroundColor)
-        return;
-      return editor.registerNodeTransform(TableCellNode, (node) => {
-        if (node.getBackgroundColor() !== null)
-          node.setBackgroundColor(null);
+      if (props.hasCellBackgroundColor) return;
+      return editor.registerNodeTransform(TableCellNode, node => {
+        if (node.getBackgroundColor() !== null) node.setBackgroundColor(null);
       });
     });
     return (_ctx, _cache) => {
@@ -2442,46 +2321,44 @@ var LexicalTablePlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE_
 });
 
 // src/components/LexicalTablePlugin.vue
-var LexicalTablePlugin_default = /* @__PURE__ */ export_helper_default(LexicalTablePlugin_vue_vue_type_script_setup_true_lang_default, [["__file", "/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalTablePlugin.vue"]]);
+var LexicalTablePlugin_default = /* @__PURE__ */export_helper_default(LexicalTablePlugin_vue_vue_type_script_setup_true_lang_default, [["__file", "/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalTablePlugin.vue"]]);
 
 // unplugin-vue:/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalClearEditorPlugin.vue?vue&type=script&setup=true&lang.ts
-import { defineComponent as _defineComponent15 } from "vue";
-import {
-  $createParagraphNode as $createParagraphNode3,
-  $getRoot as $getRoot4,
-  $getSelection as $getSelection8,
-  CLEAR_EDITOR_COMMAND,
-  COMMAND_PRIORITY_EDITOR as COMMAND_PRIORITY_EDITOR4
-} from "lexical";
-import { useAttrs } from "vue";
-var LexicalClearEditorPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */ _defineComponent15({
+import _defaultImport80 from "vue";
+const _defineComponent15 = _defaultImport80.defineComponent;
+import _defaultImport81 from "lexical";
+const COMMAND_PRIORITY_EDITOR4 = _defaultImport81.COMMAND_PRIORITY_EDITOR;
+const CLEAR_EDITOR_COMMAND = _defaultImport81.CLEAR_EDITOR_COMMAND;
+const $getSelection8 = _defaultImport81.$getSelection;
+const $getRoot4 = _defaultImport81.$getRoot;
+const $createParagraphNode3 = _defaultImport81.$createParagraphNode;
+import _defaultImport82 from "vue";
+const useAttrs = _defaultImport82.useAttrs;
+var LexicalClearEditorPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */_defineComponent15({
   __name: "LexicalClearEditorPlugin",
   emits: ["clear"],
-  setup(__props, { emit }) {
+  setup(__props, {
+    emit
+  }) {
     const editor = useEditor();
     const attrs = useAttrs();
     useMounted(() => {
       const emitExists = Boolean(attrs.onClear);
-      return editor.registerCommand(
-        CLEAR_EDITOR_COMMAND,
-        (_payload) => {
-          editor.update(() => {
-            if (emitExists) {
-              const root = $getRoot4();
-              const selection = $getSelection8();
-              const paragraph = $createParagraphNode3();
-              root.clear();
-              root.append(paragraph);
-              if (selection !== null)
-                paragraph.select();
-            } else {
-              emit("clear");
-            }
-          });
-          return true;
-        },
-        COMMAND_PRIORITY_EDITOR4
-      );
+      return editor.registerCommand(CLEAR_EDITOR_COMMAND, _payload => {
+        editor.update(() => {
+          if (emitExists) {
+            const root = $getRoot4();
+            const selection = $getSelection8();
+            const paragraph = $createParagraphNode3();
+            root.clear();
+            root.append(paragraph);
+            if (selection !== null) paragraph.select();
+          } else {
+            emit("clear");
+          }
+        });
+        return true;
+      }, COMMAND_PRIORITY_EDITOR4);
     });
     return (_ctx, _cache) => {
       return null;
@@ -2490,27 +2367,36 @@ var LexicalClearEditorPlugin_vue_vue_type_script_setup_true_lang_default = /* @_
 });
 
 // src/components/LexicalClearEditorPlugin.vue
-var LexicalClearEditorPlugin_default = /* @__PURE__ */ export_helper_default(LexicalClearEditorPlugin_vue_vue_type_script_setup_true_lang_default, [["__file", "/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalClearEditorPlugin.vue"]]);
+var LexicalClearEditorPlugin_default = /* @__PURE__ */export_helper_default(LexicalClearEditorPlugin_vue_vue_type_script_setup_true_lang_default, [["__file", "/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalClearEditorPlugin.vue"]]);
 
 // unplugin-vue:/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalCharacterLimitPlugin.vue?vue&type=script&setup=true&lang.ts
-import { defineComponent as _defineComponent16 } from "vue";
-import { toDisplayString as _toDisplayString2, normalizeClass as _normalizeClass2, openBlock as _openBlock6, createElementBlock as _createElementBlock5 } from "vue";
-import { computed as computed6, ref as ref11 } from "vue";
+import _defaultImport83 from "vue";
+const _defineComponent16 = _defaultImport83.defineComponent;
+import _defaultImport84 from "vue";
+const _createElementBlock5 = _defaultImport84.createElementBlock;
+const _openBlock6 = _defaultImport84.openBlock;
+const _normalizeClass2 = _defaultImport84.normalizeClass;
+const _toDisplayString2 = _defaultImport84.toDisplayString;
+import _defaultImport85 from "vue";
+const ref11 = _defaultImport85.ref;
+const computed6 = _defaultImport85.computed;
 var CHARACTER_LIMIT = 5;
-var LexicalCharacterLimitPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */ _defineComponent16({
+var LexicalCharacterLimitPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */_defineComponent16({
   __name: "LexicalCharacterLimitPlugin",
   props: {
-    charset: { type: String, required: false, default: "UTF-16" }
+    charset: {
+      type: String,
+      required: false,
+      default: "UTF-16"
+    }
   },
   setup(__props) {
     const props = __props;
     const editor = useEditor();
     let textEncoderInstance = null;
     function textEncoder() {
-      if (window.TextEncoder === void 0)
-        return null;
-      if (textEncoderInstance === null)
-        textEncoderInstance = new window.TextEncoder();
+      if (window.TextEncoder === void 0) return null;
+      if (textEncoderInstance === null) textEncoderInstance = new window.TextEncoder();
       return textEncoderInstance;
     }
     function utf8Length(text) {
@@ -2525,80 +2411,74 @@ var LexicalCharacterLimitPlugin_vue_vue_type_script_setup_true_lang_default = /*
     function setRemainingCharacters(payload) {
       remainingCharacters.value = payload;
     }
-    const characterLimitProps = computed6(
-      () => ({
-        remainingCharacters: setRemainingCharacters,
-        strlen: (text) => {
-          if (props.charset === "UTF-8")
-            return utf8Length(text);
-          else if (props.charset === "UTF-16")
-            return text.length;
-          else
-            throw new Error("Unrecognized charset");
-        }
-      })
-    );
+    const characterLimitProps = computed6(() => ({
+      remainingCharacters: setRemainingCharacters,
+      strlen: text => {
+        if (props.charset === "UTF-8") return utf8Length(text);else if (props.charset === "UTF-16") return text.length;else throw new Error("Unrecognized charset");
+      }
+    }));
     useCharacterLimit(editor, CHARACTER_LIMIT, characterLimitProps.value);
     return (_ctx, _cache) => {
-      return _openBlock6(), _createElementBlock5(
-        "span",
-        {
-          class: _normalizeClass2(`characters-limit ${remainingCharacters.value < 0 ? "characters-limit-exceeded" : ""}`)
-        },
-        _toDisplayString2(remainingCharacters.value),
-        3
-        /* TEXT, CLASS */
-      );
+      return _openBlock6(), _createElementBlock5("span", {
+        class: _normalizeClass2(`characters-limit ${remainingCharacters.value < 0 ? "characters-limit-exceeded" : ""}`)
+      }, _toDisplayString2(remainingCharacters.value), 3
+      /* TEXT, CLASS */);
     };
   }
 });
 
 // src/components/LexicalCharacterLimitPlugin.vue
-var LexicalCharacterLimitPlugin_default = /* @__PURE__ */ export_helper_default(LexicalCharacterLimitPlugin_vue_vue_type_script_setup_true_lang_default, [["__file", "/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalCharacterLimitPlugin.vue"]]);
+var LexicalCharacterLimitPlugin_default = /* @__PURE__ */export_helper_default(LexicalCharacterLimitPlugin_vue_vue_type_script_setup_true_lang_default, [["__file", "/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalCharacterLimitPlugin.vue"]]);
 
 // unplugin-vue:/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalAutoScrollPlugin.vue?vue&type=script&setup=true&lang.ts
-import { defineComponent as _defineComponent17 } from "vue";
-import { $getSelection as $getSelection9, $isRangeSelection as $isRangeSelection5 } from "lexical";
-var LexicalAutoScrollPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */ _defineComponent17({
+import _defaultImport86 from "vue";
+const _defineComponent17 = _defaultImport86.defineComponent;
+import _defaultImport87 from "lexical";
+const $isRangeSelection5 = _defaultImport87.$isRangeSelection;
+const $getSelection9 = _defaultImport87.$getSelection;
+var LexicalAutoScrollPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */_defineComponent17({
   __name: "LexicalAutoScrollPlugin",
   props: {
-    scrollRef: { type: null, required: true }
+    scrollRef: {
+      type: null,
+      required: true
+    }
   },
   setup(__props) {
     const props = __props;
     const editor = useEditor();
     useMounted(() => {
-      return editor.registerUpdateListener(({ tags, editorState }) => {
+      return editor.registerUpdateListener(({
+        tags,
+        editorState
+      }) => {
         const scrollElement = props.scrollRef;
-        if (!scrollElement || !tags.has("scroll-into-view"))
-          return;
+        if (!scrollElement || !tags.has("scroll-into-view")) return;
         const selection = editorState.read(() => $getSelection9());
-        if (!$isRangeSelection5(selection) || !selection.isCollapsed())
-          return;
+        if (!$isRangeSelection5(selection) || !selection.isCollapsed()) return;
         const anchorElement = editor.getElementByKey(selection.anchor.key);
-        if (anchorElement === null)
-          return;
+        if (anchorElement === null) return;
         const scrollRect = scrollElement.getBoundingClientRect();
         const rect = anchorElement.getBoundingClientRect();
-        if (rect.bottom > scrollRect.bottom)
-          anchorElement.scrollIntoView(false);
-        else if (rect.top < scrollRect.top)
-          anchorElement.scrollIntoView();
+        if (rect.bottom > scrollRect.bottom) anchorElement.scrollIntoView(false);else if (rect.top < scrollRect.top) anchorElement.scrollIntoView();
       });
     });
-    return () => {
-    };
+    return () => {};
   }
 });
 
 // src/components/LexicalAutoScrollPlugin.vue
-var LexicalAutoScrollPlugin_default = /* @__PURE__ */ export_helper_default(LexicalAutoScrollPlugin_vue_vue_type_script_setup_true_lang_default, [["__file", "/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalAutoScrollPlugin.vue"]]);
+var LexicalAutoScrollPlugin_default = /* @__PURE__ */export_helper_default(LexicalAutoScrollPlugin_vue_vue_type_script_setup_true_lang_default, [["__file", "/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalAutoScrollPlugin.vue"]]);
 
 // unplugin-vue:/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalHashtagPlugin.vue?vue&type=script&setup=true&lang.ts
-import { defineComponent as _defineComponent18 } from "vue";
-import { $createHashtagNode, HashtagNode } from "@lexical/hashtag";
-import { onMounted as onMounted4 } from "vue";
-var LexicalHashtagPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */ _defineComponent18({
+import _defaultImport88 from "vue";
+const _defineComponent18 = _defaultImport88.defineComponent;
+import _defaultImport89 from "@lexical/hashtag";
+const HashtagNode = _defaultImport89.HashtagNode;
+const $createHashtagNode = _defaultImport89.$createHashtagNode;
+import _defaultImport90 from "vue";
+const onMounted4 = _defaultImport90.onMounted;
+var LexicalHashtagPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */_defineComponent18({
   __name: "LexicalHashtagPlugin",
   setup(__props) {
     function getHashtagRegexStringChars() {
@@ -2624,7 +2504,11 @@ var LexicalHashtagPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PUR
       };
     }
     function getHashtagRegexString() {
-      const { alpha, alphanumeric, hashChars } = getHashtagRegexStringChars();
+      const {
+        alpha,
+        alphanumeric,
+        hashChars
+      } = getHashtagRegexStringChars();
       const hashtagAlpha = `[${alpha}]`;
       const hashtagAlphanumeric = `[${alphanumeric}]`;
       const hashtagBoundary = `^|$|[^&/${alphanumeric}]`;
@@ -2635,20 +2519,21 @@ var LexicalHashtagPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PUR
     const REGEX = new RegExp(getHashtagRegexString(), "i");
     const editor = useEditor();
     onMounted4(() => {
-      if (!editor.hasNodes([HashtagNode]))
-        throw new Error("HashtagPlugin: HashtagNode not registered on editor");
+      if (!editor.hasNodes([HashtagNode])) throw new Error("HashtagPlugin: HashtagNode not registered on editor");
     });
     function createHashtagNode(textNode) {
       return $createHashtagNode(textNode.getTextContent());
     }
     function getHashtagMatch(text) {
       const matchArr = REGEX.exec(text);
-      if (matchArr === null)
-        return null;
+      if (matchArr === null) return null;
       const hashtagLength = matchArr[3].length + 1;
       const startOffset = matchArr.index + matchArr[1].length;
       const endOffset = startOffset + hashtagLength;
-      return { end: endOffset, start: startOffset };
+      return {
+        end: endOffset,
+        start: startOffset
+      };
     }
     useLexicalTextEntity(getHashtagMatch, HashtagNode, createHashtagNode);
     return (_ctx, _cache) => {
@@ -2658,10 +2543,11 @@ var LexicalHashtagPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PUR
 });
 
 // src/components/LexicalHashtagPlugin.vue
-var LexicalHashtagPlugin_default = /* @__PURE__ */ export_helper_default(LexicalHashtagPlugin_vue_vue_type_script_setup_true_lang_default, [["__file", "/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalHashtagPlugin.vue"]]);
+var LexicalHashtagPlugin_default = /* @__PURE__ */export_helper_default(LexicalHashtagPlugin_vue_vue_type_script_setup_true_lang_default, [["__file", "/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalHashtagPlugin.vue"]]);
 
 // src/components/LexicalDecoratorBlockNode.ts
-import { DecoratorNode } from "lexical";
+import _defaultImport91 from "lexical";
+const DecoratorNode = _defaultImport91.DecoratorNode;
 var DecoratorBlockNode = class extends DecoratorNode {
   __format;
   constructor(format, key) {
@@ -2694,147 +2580,132 @@ function $isDecoratorBlockNode(node) {
 }
 
 // unplugin-vue:/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalBlockWithAlignableContents.vue?vue&type=script&setup=true&lang.ts
-import { defineComponent as _defineComponent19 } from "vue";
-import { unref as _unref4, renderSlot as _renderSlot6, normalizeClass as _normalizeClass3, normalizeStyle as _normalizeStyle, openBlock as _openBlock7, createElementBlock as _createElementBlock6 } from "vue";
-import {
-  $getNearestBlockElementAncestorOrThrow,
-  mergeRegister as mergeRegister10
-} from "@lexical/utils";
-import {
-  $getNodeByKey as $getNodeByKey3,
-  $getSelection as $getSelection10,
-  $isDecoratorNode,
-  $isNodeSelection as $isNodeSelection2,
-  $isRangeSelection as $isRangeSelection6,
-  CLICK_COMMAND,
-  COMMAND_PRIORITY_LOW as COMMAND_PRIORITY_LOW3,
-  FORMAT_ELEMENT_COMMAND,
-  KEY_BACKSPACE_COMMAND,
-  KEY_DELETE_COMMAND
-} from "lexical";
-import { ref as ref12 } from "vue";
-var LexicalBlockWithAlignableContents_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */ _defineComponent19({
+import _defaultImport92 from "vue";
+const _defineComponent19 = _defaultImport92.defineComponent;
+import _defaultImport93 from "vue";
+const _createElementBlock6 = _defaultImport93.createElementBlock;
+const _openBlock7 = _defaultImport93.openBlock;
+const _normalizeStyle = _defaultImport93.normalizeStyle;
+const _normalizeClass3 = _defaultImport93.normalizeClass;
+const _renderSlot6 = _defaultImport93.renderSlot;
+const _unref4 = _defaultImport93.unref;
+import _defaultImport94 from "@lexical/utils";
+const mergeRegister10 = _defaultImport94.mergeRegister;
+const $getNearestBlockElementAncestorOrThrow = _defaultImport94.$getNearestBlockElementAncestorOrThrow;
+import _defaultImport95 from "lexical";
+const KEY_DELETE_COMMAND = _defaultImport95.KEY_DELETE_COMMAND;
+const KEY_BACKSPACE_COMMAND = _defaultImport95.KEY_BACKSPACE_COMMAND;
+const FORMAT_ELEMENT_COMMAND = _defaultImport95.FORMAT_ELEMENT_COMMAND;
+const COMMAND_PRIORITY_LOW3 = _defaultImport95.COMMAND_PRIORITY_LOW;
+const CLICK_COMMAND = _defaultImport95.CLICK_COMMAND;
+const $isRangeSelection6 = _defaultImport95.$isRangeSelection;
+const $isNodeSelection2 = _defaultImport95.$isNodeSelection;
+const $isDecoratorNode = _defaultImport95.$isDecoratorNode;
+const $getSelection10 = _defaultImport95.$getSelection;
+const $getNodeByKey3 = _defaultImport95.$getNodeByKey;
+import _defaultImport96 from "vue";
+const ref12 = _defaultImport96.ref;
+var LexicalBlockWithAlignableContents_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */_defineComponent19({
   __name: "LexicalBlockWithAlignableContents",
   props: {
-    format: { type: String, required: false },
-    nodeKey: { type: String, required: true }
+    format: {
+      type: String,
+      required: false
+    },
+    nodeKey: {
+      type: String,
+      required: true
+    }
   },
   setup(__props) {
     const props = __props;
     const editor = useEditor();
-    const { isSelected, setSelected, clearSelection } = useLexicalNodeSelection(props.nodeKey);
+    const {
+      isSelected,
+      setSelected,
+      clearSelection
+    } = useLexicalNodeSelection(props.nodeKey);
     const containerRef = ref12(null);
     function onDelete(event) {
       if (isSelected.value && $isNodeSelection2($getSelection10())) {
         event.preventDefault();
         editor.update(() => {
           const node = $getNodeByKey3(props.nodeKey);
-          if ($isDecoratorNode(node) && node.isTopLevel())
-            node?.remove();
+          if ($isDecoratorNode(node) && node.isTopLevel()) node?.remove();
           setSelected(false);
         });
       }
       return false;
     }
     useMounted(() => {
-      return mergeRegister10(
-        editor.registerCommand(
-          FORMAT_ELEMENT_COMMAND,
-          (formatType) => {
-            if (isSelected.value) {
-              const selection = $getSelection10();
-              if ($isNodeSelection2(selection)) {
-                const node = $getNodeByKey3(props.nodeKey);
-                if (node && $isDecoratorBlockNode(node))
-                  node.setFormat(formatType);
-              } else if ($isRangeSelection6(selection)) {
-                const nodes = selection.getNodes();
-                for (const node of nodes) {
-                  if ($isDecoratorBlockNode(node)) {
-                    node.setFormat(formatType);
-                  } else {
-                    const element = $getNearestBlockElementAncestorOrThrow(node);
-                    element.setFormat(formatType);
-                  }
-                }
+      return mergeRegister10(editor.registerCommand(FORMAT_ELEMENT_COMMAND, formatType => {
+        if (isSelected.value) {
+          const selection = $getSelection10();
+          if ($isNodeSelection2(selection)) {
+            const node = $getNodeByKey3(props.nodeKey);
+            if (node && $isDecoratorBlockNode(node)) node.setFormat(formatType);
+          } else if ($isRangeSelection6(selection)) {
+            const nodes = selection.getNodes();
+            for (const node of nodes) {
+              if ($isDecoratorBlockNode(node)) {
+                node.setFormat(formatType);
+              } else {
+                const element = $getNearestBlockElementAncestorOrThrow(node);
+                element.setFormat(formatType);
               }
-              return true;
             }
-            return false;
-          },
-          COMMAND_PRIORITY_LOW3
-        ),
-        editor.registerCommand(
-          CLICK_COMMAND,
-          (event) => {
-            if (event.target === containerRef.value) {
-              event.preventDefault();
-              if (!event.shiftKey)
-                clearSelection();
-              setSelected(!isSelected.value);
-              return true;
-            }
-            return false;
-          },
-          COMMAND_PRIORITY_LOW3
-        ),
-        editor.registerCommand(
-          KEY_DELETE_COMMAND,
-          onDelete,
-          COMMAND_PRIORITY_LOW3
-        ),
-        editor.registerCommand(
-          KEY_BACKSPACE_COMMAND,
-          onDelete,
-          COMMAND_PRIORITY_LOW3
-        )
-      );
+          }
+          return true;
+        }
+        return false;
+      }, COMMAND_PRIORITY_LOW3), editor.registerCommand(CLICK_COMMAND, event => {
+        if (event.target === containerRef.value) {
+          event.preventDefault();
+          if (!event.shiftKey) clearSelection();
+          setSelected(!isSelected.value);
+          return true;
+        }
+        return false;
+      }, COMMAND_PRIORITY_LOW3), editor.registerCommand(KEY_DELETE_COMMAND, onDelete, COMMAND_PRIORITY_LOW3), editor.registerCommand(KEY_BACKSPACE_COMMAND, onDelete, COMMAND_PRIORITY_LOW3));
     });
     return (_ctx, _cache) => {
-      return _openBlock7(), _createElementBlock6(
-        "div",
-        {
-          ref_key: "containerRef",
-          ref: containerRef,
-          style: _normalizeStyle(`text-align: ${_ctx.format}`),
-          class: _normalizeClass3(`embed-block${_unref4(isSelected) ? " focused" : ""}`)
-        },
-        [
-          _renderSlot6(_ctx.$slots, "default")
-        ],
-        6
-        /* CLASS, STYLE */
-      );
+      return _openBlock7(), _createElementBlock6("div", {
+        ref_key: "containerRef",
+        ref: containerRef,
+        style: _normalizeStyle(`text-align: ${_ctx.format}`),
+        class: _normalizeClass3(`embed-block${_unref4(isSelected) ? " focused" : ""}`)
+      }, [_renderSlot6(_ctx.$slots, "default")], 6
+      /* CLASS, STYLE */);
     };
   }
 });
 
 // src/components/LexicalBlockWithAlignableContents.vue
-var LexicalBlockWithAlignableContents_default = /* @__PURE__ */ export_helper_default(LexicalBlockWithAlignableContents_vue_vue_type_script_setup_true_lang_default, [["__file", "/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalBlockWithAlignableContents.vue"]]);
+var LexicalBlockWithAlignableContents_default = /* @__PURE__ */export_helper_default(LexicalBlockWithAlignableContents_vue_vue_type_script_setup_true_lang_default, [["__file", "/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalBlockWithAlignableContents.vue"]]);
 
 // unplugin-vue:/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalCheckListPlugin.vue?vue&type=script&setup=true&lang.ts
-import { defineComponent as _defineComponent20 } from "vue";
-import {
-  $getNearestNodeFromDOMNode,
-  $getSelection as $getSelection11,
-  $isElementNode as $isElementNode3,
-  $isRangeSelection as $isRangeSelection7,
-  COMMAND_PRIORITY_LOW as COMMAND_PRIORITY_LOW4,
-  KEY_ARROW_DOWN_COMMAND as KEY_ARROW_DOWN_COMMAND2,
-  KEY_ARROW_LEFT_COMMAND,
-  KEY_ARROW_UP_COMMAND as KEY_ARROW_UP_COMMAND2,
-  KEY_ESCAPE_COMMAND as KEY_ESCAPE_COMMAND2,
-  KEY_SPACE_COMMAND
-} from "lexical";
-import {
-  $isListItemNode,
-  $isListNode,
-  INSERT_CHECK_LIST_COMMAND,
-  insertList as insertList2
-} from "@lexical/list";
-import { $findMatchingParent, mergeRegister as mergeRegister11 } from "@lexical/utils";
-
+import _defaultImport97 from "vue";
+const _defineComponent20 = _defaultImport97.defineComponent;
+import _defaultImport98 from "lexical";
+const KEY_SPACE_COMMAND = _defaultImport98.KEY_SPACE_COMMAND;
+const KEY_ESCAPE_COMMAND2 = _defaultImport98.KEY_ESCAPE_COMMAND;
+const KEY_ARROW_UP_COMMAND2 = _defaultImport98.KEY_ARROW_UP_COMMAND;
+const KEY_ARROW_LEFT_COMMAND = _defaultImport98.KEY_ARROW_LEFT_COMMAND;
+const KEY_ARROW_DOWN_COMMAND2 = _defaultImport98.KEY_ARROW_DOWN_COMMAND;
+const COMMAND_PRIORITY_LOW4 = _defaultImport98.COMMAND_PRIORITY_LOW;
+const $isRangeSelection7 = _defaultImport98.$isRangeSelection;
+const $isElementNode3 = _defaultImport98.$isElementNode;
+const $getSelection11 = _defaultImport98.$getSelection;
+const $getNearestNodeFromDOMNode = _defaultImport98.$getNearestNodeFromDOMNode;
+import _defaultImport99 from "@lexical/list";
+const insertList2 = _defaultImport99.insertList;
+const INSERT_CHECK_LIST_COMMAND = _defaultImport99.INSERT_CHECK_LIST_COMMAND;
+const $isListNode = _defaultImport99.$isListNode;
+const $isListItemNode = _defaultImport99.$isListItemNode;
+import _defaultImport100 from "@lexical/utils";
 // src/composables/listenerManager.ts
+const mergeRegister11 = _defaultImport100.mergeRegister;
+const $findMatchingParent = _defaultImport100.$findMatchingParent;
 var handleClickAndPointerDownListenersCount = 0;
 var handleClickAndPointerDownListenersUnregister;
 function registerClickAndPointerListeners(register, unregister) {
@@ -2851,100 +2722,66 @@ function registerClickAndPointerListeners(register, unregister) {
 }
 
 // unplugin-vue:/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalCheckListPlugin.vue?vue&type=script&setup=true&lang.ts
-var LexicalCheckListPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */ _defineComponent20({
+var LexicalCheckListPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */_defineComponent20({
   __name: "LexicalCheckListPlugin",
   setup(__props) {
     const editor = useEditor();
     useMounted(() => {
-      return mergeRegister11(
-        editor.registerCommand(
-          INSERT_CHECK_LIST_COMMAND,
-          () => {
-            insertList2(editor, "check");
-            return true;
-          },
-          COMMAND_PRIORITY_LOW4
-        ),
-        editor.registerCommand(
-          KEY_ARROW_DOWN_COMMAND2,
-          (event) => {
-            return handleArrownUpOrDown(event, editor, false);
-          },
-          COMMAND_PRIORITY_LOW4
-        ),
-        editor.registerCommand(
-          KEY_ARROW_UP_COMMAND2,
-          (event) => {
-            return handleArrownUpOrDown(event, editor, true);
-          },
-          COMMAND_PRIORITY_LOW4
-        ),
-        editor.registerCommand(
-          KEY_ESCAPE_COMMAND2,
-          (_event) => {
-            const activeItem = getActiveCheckListItem();
-            if (activeItem != null) {
-              const rootElement = editor.getRootElement();
-              if (rootElement != null)
-                rootElement.focus();
-              return true;
+      return mergeRegister11(editor.registerCommand(INSERT_CHECK_LIST_COMMAND, () => {
+        insertList2(editor, "check");
+        return true;
+      }, COMMAND_PRIORITY_LOW4), editor.registerCommand(KEY_ARROW_DOWN_COMMAND2, event => {
+        return handleArrownUpOrDown(event, editor, false);
+      }, COMMAND_PRIORITY_LOW4), editor.registerCommand(KEY_ARROW_UP_COMMAND2, event => {
+        return handleArrownUpOrDown(event, editor, true);
+      }, COMMAND_PRIORITY_LOW4), editor.registerCommand(KEY_ESCAPE_COMMAND2, _event => {
+        const activeItem = getActiveCheckListItem();
+        if (activeItem != null) {
+          const rootElement = editor.getRootElement();
+          if (rootElement != null) rootElement.focus();
+          return true;
+        }
+        return false;
+      }, COMMAND_PRIORITY_LOW4), editor.registerCommand(KEY_SPACE_COMMAND, event => {
+        const activeItem = getActiveCheckListItem();
+        if (activeItem != null) {
+          editor.update(() => {
+            const listItemNode = $getNearestNodeFromDOMNode(activeItem);
+            if ($isListItemNode(listItemNode)) {
+              event.preventDefault();
+              listItemNode.toggleChecked();
             }
-            return false;
-          },
-          COMMAND_PRIORITY_LOW4
-        ),
-        editor.registerCommand(
-          KEY_SPACE_COMMAND,
-          (event) => {
-            const activeItem = getActiveCheckListItem();
-            if (activeItem != null) {
-              editor.update(() => {
-                const listItemNode = $getNearestNodeFromDOMNode(activeItem);
-                if ($isListItemNode(listItemNode)) {
-                  event.preventDefault();
-                  listItemNode.toggleChecked();
-                }
-              });
-              return true;
-            }
-            return false;
-          },
-          COMMAND_PRIORITY_LOW4
-        ),
-        editor.registerCommand(
-          KEY_ARROW_LEFT_COMMAND,
-          (event) => {
-            return editor.getEditorState().read(() => {
-              const selection = $getSelection11();
-              if ($isRangeSelection7(selection) && selection.isCollapsed()) {
-                const { anchor } = selection;
-                const isElement = anchor.type === "element";
-                if (isElement || anchor.offset === 0) {
-                  const anchorNode = anchor.getNode();
-                  const elementNode = $findMatchingParent(
-                    anchorNode,
-                    (node) => $isElementNode3(node) && !node.isInline()
-                  );
-                  if ($isListItemNode(elementNode)) {
-                    const parent = elementNode.getParent();
-                    if ($isListNode(parent) && parent.getListType() === "check" && (isElement || elementNode.getFirstDescendant() === anchorNode)) {
-                      const domNode = editor.getElementByKey(elementNode.__key);
-                      if (domNode != null && document.activeElement !== domNode) {
-                        domNode.focus();
-                        event.preventDefault();
-                        return true;
-                      }
-                    }
+          });
+          return true;
+        }
+        return false;
+      }, COMMAND_PRIORITY_LOW4), editor.registerCommand(KEY_ARROW_LEFT_COMMAND, event => {
+        return editor.getEditorState().read(() => {
+          const selection = $getSelection11();
+          if ($isRangeSelection7(selection) && selection.isCollapsed()) {
+            const {
+              anchor
+            } = selection;
+            const isElement = anchor.type === "element";
+            if (isElement || anchor.offset === 0) {
+              const anchorNode = anchor.getNode();
+              const elementNode = $findMatchingParent(anchorNode, node => $isElementNode3(node) && !node.isInline());
+              if ($isListItemNode(elementNode)) {
+                const parent = elementNode.getParent();
+                if ($isListNode(parent) && parent.getListType() === "check" && (isElement || elementNode.getFirstDescendant() === anchorNode)) {
+                  const domNode = editor.getElementByKey(elementNode.__key);
+                  if (domNode != null && document.activeElement !== domNode) {
+                    domNode.focus();
+                    event.preventDefault();
+                    return true;
                   }
                 }
               }
-              return false;
-            });
-          },
-          COMMAND_PRIORITY_LOW4
-        ),
-        listenPointerDown()
-      );
+            }
+          }
+          return false;
+        });
+      }, COMMAND_PRIORITY_LOW4), listenPointerDown());
     });
     function listenPointerDown() {
       return registerClickAndPointerListeners(() => {
@@ -2957,18 +2794,14 @@ var LexicalCheckListPlugin_vue_vue_type_script_setup_true_lang_default = /* @__P
     }
     function handleCheckItemEvent(event, callback) {
       const target = event.target;
-      if (!(target instanceof HTMLElement))
-        return;
+      if (!(target instanceof HTMLElement)) return;
       const firstChild = target.firstChild;
-      if (firstChild != null && (firstChild.tagName === "UL" || firstChild.tagName === "OL"))
-        return;
+      if (firstChild != null && (firstChild.tagName === "UL" || firstChild.tagName === "OL")) return;
       const parentNode = target.parentNode;
-      if (!parentNode || parentNode.__lexicalListType !== "check")
-        return;
+      if (!parentNode || parentNode.__lexicalListType !== "check") return;
       const pageX = event.pageX;
       const rect = target.getBoundingClientRect();
-      if (target.dir === "rtl" ? pageX < rect.right && pageX > rect.right - 20 : pageX > rect.left && pageX < rect.left + 20)
-        callback();
+      if (target.dir === "rtl" ? pageX < rect.right && pageX > rect.right - 20 : pageX > rect.left && pageX < rect.left + 20) callback();
     }
     function handleClick(event) {
       handleCheckItemEvent(event, () => {
@@ -2993,14 +2826,15 @@ var LexicalCheckListPlugin_vue_vue_type_script_setup_true_lang_default = /* @__P
     function findEditor(target) {
       let node = target;
       while (node) {
-        if (node.__lexicalEditor)
-          return node.__lexicalEditor;
+        if (node.__lexicalEditor) return node.__lexicalEditor;
         node = node.parentNode;
       }
       return null;
     }
     function getActiveCheckListItem() {
-      const { activeElement } = document;
+      const {
+        activeElement
+      } = document;
       return activeElement !== null && activeElement.tagName === "LI" && activeElement.parentNode !== null && activeElement.parentNode.__lexicalListType === "check" ? activeElement : null;
     }
     function findCheckListItemSibling(node, backward) {
@@ -3014,8 +2848,7 @@ var LexicalCheckListPlugin_vue_vue_type_script_setup_true_lang_default = /* @__P
       }
       while ($isListItemNode(sibling)) {
         const firstChild = backward ? sibling.getLastChild() : sibling.getFirstChild();
-        if (!$isListNode(firstChild))
-          return sibling;
+        if (!$isListNode(firstChild)) return sibling;
         sibling = backward ? firstChild.getLastChild() : firstChild.getFirstChild();
       }
       return null;
@@ -3025,8 +2858,7 @@ var LexicalCheckListPlugin_vue_vue_type_script_setup_true_lang_default = /* @__P
       if (activeItem != null) {
         editor2.update(() => {
           const listItem = $getNearestNodeFromDOMNode(activeItem);
-          if (!$isListItemNode(listItem))
-            return;
+          if (!$isListItemNode(listItem)) return;
           const nextListItem = findCheckListItemSibling(listItem, backward);
           if (nextListItem != null) {
             nextListItem.selectStart();
@@ -3049,15 +2881,22 @@ var LexicalCheckListPlugin_vue_vue_type_script_setup_true_lang_default = /* @__P
 });
 
 // src/components/LexicalCheckListPlugin.vue
-var LexicalCheckListPlugin_default = /* @__PURE__ */ export_helper_default(LexicalCheckListPlugin_vue_vue_type_script_setup_true_lang_default, [["__file", "/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalCheckListPlugin.vue"]]);
+var LexicalCheckListPlugin_default = /* @__PURE__ */export_helper_default(LexicalCheckListPlugin_vue_vue_type_script_setup_true_lang_default, [["__file", "/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalCheckListPlugin.vue"]]);
 
 // unplugin-vue:/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalMarkdownShortcutPlugin.vue?vue&type=script&setup=true&lang.ts
-import { defineComponent as _defineComponent21 } from "vue";
-import { TRANSFORMERS, registerMarkdownShortcuts } from "@lexical/markdown";
-var LexicalMarkdownShortcutPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */ _defineComponent21({
+import _defaultImport101 from "vue";
+const _defineComponent21 = _defaultImport101.defineComponent;
+import _defaultImport102 from "@lexical/markdown";
+const registerMarkdownShortcuts = _defaultImport102.registerMarkdownShortcuts;
+const TRANSFORMERS = _defaultImport102.TRANSFORMERS;
+var LexicalMarkdownShortcutPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */_defineComponent21({
   __name: "LexicalMarkdownShortcutPlugin",
   props: {
-    transformers: { type: Array, required: false, default: () => [...TRANSFORMERS] }
+    transformers: {
+      type: Array,
+      required: false,
+      default: () => [...TRANSFORMERS]
+    }
   },
   setup(__props) {
     const props = __props;
@@ -3072,37 +2911,29 @@ var LexicalMarkdownShortcutPlugin_vue_vue_type_script_setup_true_lang_default = 
 });
 
 // src/components/LexicalMarkdownShortcutPlugin.vue
-var LexicalMarkdownShortcutPlugin_default = /* @__PURE__ */ export_helper_default(LexicalMarkdownShortcutPlugin_vue_vue_type_script_setup_true_lang_default, [["__file", "/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalMarkdownShortcutPlugin.vue"]]);
+var LexicalMarkdownShortcutPlugin_default = /* @__PURE__ */export_helper_default(LexicalMarkdownShortcutPlugin_vue_vue_type_script_setup_true_lang_default, [["__file", "/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalMarkdownShortcutPlugin.vue"]]);
 
 // unplugin-vue:/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalTabIndentationPlugin.vue?vue&type=script&setup=true&lang.ts
-import { defineComponent as _defineComponent22 } from "vue";
-import {
-  $getSelection as $getSelection12,
-  $isRangeSelection as $isRangeSelection8,
-  COMMAND_PRIORITY_EDITOR as COMMAND_PRIORITY_EDITOR5,
-  INDENT_CONTENT_COMMAND,
-  KEY_TAB_COMMAND as KEY_TAB_COMMAND2,
-  OUTDENT_CONTENT_COMMAND
-} from "lexical";
-var LexicalTabIndentationPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */ _defineComponent22({
+import _defaultImport103 from "vue";
+const _defineComponent22 = _defaultImport103.defineComponent;
+import _defaultImport104 from "lexical";
+const OUTDENT_CONTENT_COMMAND = _defaultImport104.OUTDENT_CONTENT_COMMAND;
+const KEY_TAB_COMMAND2 = _defaultImport104.KEY_TAB_COMMAND;
+const INDENT_CONTENT_COMMAND = _defaultImport104.INDENT_CONTENT_COMMAND;
+const COMMAND_PRIORITY_EDITOR5 = _defaultImport104.COMMAND_PRIORITY_EDITOR;
+const $isRangeSelection8 = _defaultImport104.$isRangeSelection;
+const $getSelection12 = _defaultImport104.$getSelection;
+var LexicalTabIndentationPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */_defineComponent22({
   __name: "LexicalTabIndentationPlugin",
   setup(__props) {
     const editor = useEditor();
     useMounted(() => {
-      return editor.registerCommand(
-        KEY_TAB_COMMAND2,
-        (event) => {
-          const selection = $getSelection12();
-          if (!$isRangeSelection8(selection))
-            return false;
-          event.preventDefault();
-          return editor.dispatchCommand(
-            event.shiftKey ? OUTDENT_CONTENT_COMMAND : INDENT_CONTENT_COMMAND,
-            void 0
-          );
-        },
-        COMMAND_PRIORITY_EDITOR5
-      );
+      return editor.registerCommand(KEY_TAB_COMMAND2, event => {
+        const selection = $getSelection12();
+        if (!$isRangeSelection8(selection)) return false;
+        event.preventDefault();
+        return editor.dispatchCommand(event.shiftKey ? OUTDENT_CONTENT_COMMAND : INDENT_CONTENT_COMMAND, void 0);
+      }, COMMAND_PRIORITY_EDITOR5);
     });
     return (_ctx, _cache) => {
       return null;
@@ -3111,169 +2942,108 @@ var LexicalTabIndentationPlugin_vue_vue_type_script_setup_true_lang_default = /*
 });
 
 // src/components/LexicalTabIndentationPlugin.vue
-var LexicalTabIndentationPlugin_default = /* @__PURE__ */ export_helper_default(LexicalTabIndentationPlugin_vue_vue_type_script_setup_true_lang_default, [["__file", "/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalTabIndentationPlugin.vue"]]);
+var LexicalTabIndentationPlugin_default = /* @__PURE__ */export_helper_default(LexicalTabIndentationPlugin_vue_vue_type_script_setup_true_lang_default, [["__file", "/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalTabIndentationPlugin.vue"]]);
 
 // unplugin-vue:/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalCollaborationPlugin.vue?vue&type=script&setup=true&lang.ts
-import { defineComponent as _defineComponent23 } from "vue";
-import { unref as _unref5, createElementVNode as _createElementVNode2, Teleport as _Teleport, openBlock as _openBlock8, createBlock as _createBlock2 } from "vue";
-import { computed as computed7, watchEffect as watchEffect3 } from "vue";
-
+import _defaultImport105 from "vue";
+const _defineComponent23 = _defaultImport105.defineComponent;
+import _defaultImport106 from "vue";
+const _createBlock2 = _defaultImport106.createBlock;
+const _openBlock8 = _defaultImport106.openBlock;
+const _Teleport = _defaultImport106.Teleport;
+const _createElementVNode2 = _defaultImport106.createElementVNode;
+const _unref5 = _defaultImport106.unref;
+import _defaultImport107 from "vue";
 // src/composables/useCollaborationContext.ts
-import { ref as ref13 } from "vue";
-var entries = [
-  ["Cat", "rgb(125, 50, 0)"],
-  ["Dog", "rgb(100, 0, 0)"],
-  ["Rabbit", "rgb(150, 0, 0)"],
-  ["Frog", "rgb(200, 0, 0)"],
-  ["Fox", "rgb(200, 75, 0)"],
-  ["Hedgehog", "rgb(0, 75, 0)"],
-  ["Pigeon", "rgb(0, 125, 0)"],
-  ["Squirrel", "rgb(75, 100, 0)"],
-  ["Bear", "rgb(125, 100, 0)"],
-  ["Tiger", "rgb(0, 0, 150)"],
-  ["Leopard", "rgb(0, 0, 200)"],
-  ["Zebra", "rgb(0, 0, 250)"],
-  ["Wolf", "rgb(0, 100, 150)"],
-  ["Owl", "rgb(0, 100, 100)"],
-  ["Gull", "rgb(100, 0, 100)"],
-  ["Squid", "rgb(150, 0, 150)"]
-];
+const watchEffect3 = _defaultImport107.watchEffect;
+const computed7 = _defaultImport107.computed;
+import _defaultImport108 from "vue";
+const ref13 = _defaultImport108.ref;
+var entries = [["Cat", "rgb(125, 50, 0)"], ["Dog", "rgb(100, 0, 0)"], ["Rabbit", "rgb(150, 0, 0)"], ["Frog", "rgb(200, 0, 0)"], ["Fox", "rgb(200, 75, 0)"], ["Hedgehog", "rgb(0, 75, 0)"], ["Pigeon", "rgb(0, 125, 0)"], ["Squirrel", "rgb(75, 100, 0)"], ["Bear", "rgb(125, 100, 0)"], ["Tiger", "rgb(0, 0, 150)"], ["Leopard", "rgb(0, 0, 200)"], ["Zebra", "rgb(0, 0, 250)"], ["Wolf", "rgb(0, 100, 150)"], ["Owl", "rgb(0, 100, 100)"], ["Gull", "rgb(100, 0, 100)"], ["Squid", "rgb(150, 0, 150)"]];
 var randomEntry = entries[Math.floor(Math.random() * entries.length)];
 var useCollaborationContext_default = ref13({
   clientID: 0,
   color: randomEntry[1],
   isCollabActive: false,
   name: randomEntry[0],
-  yjsDocMap: /* @__PURE__ */ new Map()
+  yjsDocMap: /* @__PURE__ */new Map()
 });
 
 // unplugin-vue:/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalCollaborationPlugin.vue?vue&type=script&setup=true&lang.ts
-var LexicalCollaborationPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */ _defineComponent23({
+var LexicalCollaborationPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */_defineComponent23({
   __name: "LexicalCollaborationPlugin",
   props: {
-    id: { type: String, required: true },
-    providerFactory: { type: Function, required: true },
-    shouldBootstrap: { type: Boolean, required: true },
-    username: { type: String, required: false },
-    cursorColor: { type: String, required: false },
-    cursorsContainerRef: { type: null, required: false },
-    initialEditorState: { type: [null, String, Object, Function], required: false },
-    excludedProperties: { type: Map, required: false },
-    awarenessData: { type: Object, required: false }
+    id: {
+      type: String,
+      required: true
+    },
+    providerFactory: {
+      type: Function,
+      required: true
+    },
+    shouldBootstrap: {
+      type: Boolean,
+      required: true
+    },
+    username: {
+      type: String,
+      required: false
+    },
+    cursorColor: {
+      type: String,
+      required: false
+    },
+    cursorsContainerRef: {
+      type: null,
+      required: false
+    },
+    initialEditorState: {
+      type: [null, String, Object, Function],
+      required: false
+    },
+    excludedProperties: {
+      type: Map,
+      required: false
+    },
+    awarenessData: {
+      type: Object,
+      required: false
+    }
   },
   setup(__props) {
     const props = __props;
     watchEffect3(() => {
-      if (props.username !== void 0)
-        useCollaborationContext_default.value.name = props.username;
-      if (props.cursorColor !== void 0)
-        useCollaborationContext_default.value.color = props.cursorColor;
+      if (props.username !== void 0) useCollaborationContext_default.value.name = props.username;
+      if (props.cursorColor !== void 0) useCollaborationContext_default.value.color = props.cursorColor;
     });
     const editor = useEditor();
     useEffect(() => {
       useCollaborationContext_default.value.isCollabActive = true;
       return () => {
-        if (editor._parentEditor == null)
-          useCollaborationContext_default.value.isCollabActive = false;
+        if (editor._parentEditor == null) useCollaborationContext_default.value.isCollabActive = false;
       };
     });
     const provider = computed7(() => props.providerFactory(props.id, useCollaborationContext_default.value.yjsDocMap));
-    const binding = useYjsCollaboration(
-      editor,
-      props.id,
-      provider.value,
-      useCollaborationContext_default.value.yjsDocMap,
-      useCollaborationContext_default.value.name,
-      useCollaborationContext_default.value.color,
-      props.shouldBootstrap,
-      props.initialEditorState,
-      props.excludedProperties,
-      props.awarenessData
-    );
+    const binding = useYjsCollaboration(editor, props.id, provider.value, useCollaborationContext_default.value.yjsDocMap, useCollaborationContext_default.value.name, useCollaborationContext_default.value.color, props.shouldBootstrap, props.initialEditorState, props.excludedProperties, props.awarenessData);
     watchEffect3(() => {
       useCollaborationContext_default.value.clientID = binding.value.clientID;
     });
     useYjsHistory(editor, binding.value);
-    useYjsFocusTracking(
-      editor,
-      provider.value,
-      useCollaborationContext_default.value.name,
-      useCollaborationContext_default.value.color,
-      props.awarenessData
-    );
+    useYjsFocusTracking(editor, provider.value, useCollaborationContext_default.value.name, useCollaborationContext_default.value.color, props.awarenessData);
     return (_ctx, _cache) => {
       return _openBlock8(), _createBlock2(_Teleport, {
         to: _ctx.cursorsContainerRef || "body"
-      }, [
-        _createElementVNode2(
-          "div",
-          {
-            ref: (element) => _unref5(binding).cursorsContainer = element
-          },
-          null,
-          512
-          /* NEED_PATCH */
-        )
-      ], 8, ["to"]);
+      }, [_createElementVNode2("div", {
+        ref: element => _unref5(binding).cursorsContainer = element
+      }, null, 512
+      /* NEED_PATCH */)], 8, ["to"]);
     };
   }
 });
 
 // src/components/LexicalCollaborationPlugin.vue
-var LexicalCollaborationPlugin_default = /* @__PURE__ */ export_helper_default(LexicalCollaborationPlugin_vue_vue_type_script_setup_true_lang_default, [["__file", "/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalCollaborationPlugin.vue"]]);
-export {
-  $createDecoratorBlockNode,
-  $isDecoratorBlockNode,
-  DecoratorBlockNode,
-  LexicalAutoFocusPlugin_default as LexicalAutoFocusPlugin,
-  LexicalAutoLinkPlugin_default as LexicalAutoLinkPlugin,
-  LexicalAutoScrollPlugin_default as LexicalAutoScrollPlugin,
-  LexicalBlockWithAlignableContents_default as LexicalBlockWithAlignableContents,
-  LexicalCharacterLimitPlugin_default as LexicalCharacterLimitPlugin,
-  LexicalCheckListPlugin_default as LexicalCheckListPlugin,
-  LexicalClearEditorPlugin_default as LexicalClearEditorPlugin,
-  LexicalCollaborationPlugin_default as LexicalCollaborationPlugin,
-  LexicalComposer_default as LexicalComposer,
-  LexicalContentEditable_default as LexicalContentEditable,
-  LexicalDecoratedTeleports_default as LexicalDecoratedTeleports,
-  LexicalHashtagPlugin_default as LexicalHashtagPlugin,
-  LexicalHistoryPlugin_default as LexicalHistoryPlugin,
-  LexicalLinkPlugin_default as LexicalLinkPlugin,
-  LexicalListPlugin_default as LexicalListPlugin,
-  LexicalMarkdownShortcutPlugin_default as LexicalMarkdownShortcutPlugin,
-  LexicalOnChangePlugin_default as LexicalOnChangePlugin,
-  LexicalPlainTextPlugin_default as LexicalPlainTextPlugin,
-  LexicalPopoverMenu_default as LexicalPopoverMenu,
-  LexicalRichTextPlugin_default as LexicalRichTextPlugin,
-  LexicalTabIndentationPlugin_default as LexicalTabIndentationPlugin,
-  LexicalTablePlugin_default as LexicalTablePlugin,
-  LexicalTreeViewPlugin_default as LexicalTreeViewPlugin,
-  LexicalTypeaheadMenuPlugin_default as LexicalTypeaheadMenuPlugin,
-  PUNCTUATION,
-  TypeaheadOption,
-  mergePrevious,
-  useAutoLink,
-  useBasicTypeaheadTriggerMatch,
-  useCanShowPlaceholder,
-  useCharacterLimit,
-  useDecorators,
-  useDynamicPositioning,
-  useEditor,
-  useEffect,
-  useHistory,
-  useLexicalIsTextContentEmpty,
-  useLexicalNodeSelection,
-  useLexicalTextEntity,
-  useLexicalTypeaheadMenuPlugin,
-  useList,
-  useMenuAnchorRef,
-  useMounted,
-  usePlainTextSetup,
-  useRichTextSetup,
-  useYjsCollaboration,
-  useYjsFocusTracking,
-  useYjsHistory
-};
+var LexicalCollaborationPlugin_default = /* @__PURE__ */export_helper_default(LexicalCollaborationPlugin_vue_vue_type_script_setup_true_lang_default, [["__file", "/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalCollaborationPlugin.vue"]]);
+export { $createDecoratorBlockNode, $isDecoratorBlockNode, DecoratorBlockNode, LexicalAutoFocusPlugin_default as LexicalAutoFocusPlugin, LexicalAutoLinkPlugin_default as LexicalAutoLinkPlugin, LexicalAutoScrollPlugin_default as LexicalAutoScrollPlugin, LexicalBlockWithAlignableContents_default as LexicalBlockWithAlignableContents, LexicalCharacterLimitPlugin_default as LexicalCharacterLimitPlugin, LexicalCheckListPlugin_default as LexicalCheckListPlugin, LexicalClearEditorPlugin_default as LexicalClearEditorPlugin, LexicalCollaborationPlugin_default as LexicalCollaborationPlugin, LexicalComposer_default as LexicalComposer, LexicalContentEditable_default as LexicalContentEditable, LexicalDecoratedTeleports_default as LexicalDecoratedTeleports, LexicalHashtagPlugin_default as LexicalHashtagPlugin, LexicalHistoryPlugin_default as LexicalHistoryPlugin, LexicalLinkPlugin_default as LexicalLinkPlugin, LexicalListPlugin_default as LexicalListPlugin, LexicalMarkdownShortcutPlugin_default as LexicalMarkdownShortcutPlugin, LexicalOnChangePlugin_default as LexicalOnChangePlugin, LexicalPlainTextPlugin_default as LexicalPlainTextPlugin, LexicalPopoverMenu_default as LexicalPopoverMenu, LexicalRichTextPlugin_default as LexicalRichTextPlugin, LexicalTabIndentationPlugin_default as LexicalTabIndentationPlugin, LexicalTablePlugin_default as LexicalTablePlugin, LexicalTreeViewPlugin_default as LexicalTreeViewPlugin, LexicalTypeaheadMenuPlugin_default as LexicalTypeaheadMenuPlugin, PUNCTUATION, TypeaheadOption, mergePrevious, useAutoLink, useBasicTypeaheadTriggerMatch, useCanShowPlaceholder, useCharacterLimit, useDecorators, useDynamicPositioning, useEditor, useEffect, useHistory, useLexicalIsTextContentEmpty, useLexicalNodeSelection, useLexicalTextEntity, useLexicalTypeaheadMenuPlugin, useList, useMenuAnchorRef, useMounted, usePlainTextSetup, useRichTextSetup, useYjsCollaboration, useYjsFocusTracking, useYjsHistory };
 /*!
  * Original code by Meta Platforms
  * MIT Licensed, Copyright (c) Meta Platforms, Inc. and affiliates, see https://github.com/facebook/lexical/blob/main/LICENSE for details
