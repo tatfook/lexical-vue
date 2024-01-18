@@ -595,10 +595,11 @@ function useLexicalNodeSelection(key) {
         selection = (0, import_lexical3.$createNodeSelection)();
         (0, import_lexical3.$setSelection)(selection);
       }
-      if (selected)
+      if (selected) {
         selection.add(realKeyVal);
-      else
+      } else {
         selection.delete(realKeyVal);
+      }
     });
   };
   const clearSelection = () => {
@@ -1715,6 +1716,7 @@ var import_mark = require("@lexical/mark");
 var import_lexical9 = require("lexical");
 var import_vue32 = require("vue");
 var import_link2 = require("@lexical/link");
+var import_table = require("@lexical/table");
 var _hoisted_12 = ["max"];
 var LexicalTreeViewPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */ (0, import_vue30.defineComponent)({
   __name: "LexicalTreeViewPlugin",
@@ -1756,7 +1758,9 @@ var LexicalTreeViewPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PU
   \u2514 focus { key: ${focus.key}, offset: ${focusOffset === null ? "null" : focusOffset}, type: ${focus.type} }`;
       return res;
     }
-    function printObjectSelection(selection) {
+    function printNodeSelection(selection) {
+      if (!(0, import_lexical9.$isNodeSelection)(selection))
+        return "";
       return `: node
   \u2514 [${Array.from(selection._nodes).join(", ")}]`;
     }
@@ -1787,7 +1791,7 @@ var LexicalTreeViewPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PU
             typeDisplay
           });
         });
-        return selection === null ? ": null" : (0, import_lexical9.$isRangeSelection)(selection) ? printRangeSelection(selection) : (0, import_lexical9.DEPRECATED_$isGridSelection)(selection) ? printGridSelection(selection) : printObjectSelection(selection);
+        return selection === null ? ": null" : (0, import_lexical9.$isRangeSelection)(selection) ? printRangeSelection(selection) : (0, import_table.$isGridSelection)(selection) ? printGridSelection(selection) : printNodeSelection(selection);
       });
       return `${res}
  selection${selectionString}`;
@@ -2272,7 +2276,7 @@ var LexicalLinkPlugin_default = /* @__PURE__ */ export_helper_default(LexicalLin
 
 // unplugin-vue:/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalTablePlugin.vue?vue&type=script&setup=true&lang.ts
 var import_vue40 = require("vue");
-var import_table = require("@lexical/table");
+var import_table2 = require("@lexical/table");
 var import_lexical11 = require("lexical");
 var import_utils10 = require("@lexical/utils");
 var LexicalTablePlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */ (0, import_vue40.defineComponent)({
@@ -2293,15 +2297,15 @@ var LexicalTablePlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE_
         parent.append(node);
     }
     useMounted(() => {
-      if (!editor.hasNodes([import_table.TableNode, import_table.TableCellNode, import_table.TableRowNode])) {
+      if (!editor.hasNodes([import_table2.TableNode, import_table2.TableCellNode, import_table2.TableRowNode])) {
         throw new Error(
           "TablePlugin: TableNode, TableCellNode or TableRowNode not registered on editor"
         );
       }
       return editor.registerCommand(
-        import_table.INSERT_TABLE_COMMAND,
+        import_table2.INSERT_TABLE_COMMAND,
         ({ columns, rows, includeHeaders }) => {
-          const tableNode = (0, import_table.$createTableNodeWithDimensions)(
+          const tableNode = (0, import_table2.$createTableNodeWithDimensions)(
             Number(rows),
             Number(columns),
             includeHeaders
@@ -2323,7 +2327,7 @@ var LexicalTablePlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE_
           nodeKey
         );
         if (tableElement && !tableSelections.has(nodeKey)) {
-          const tableSelection = (0, import_table.applyTableHandlers)(
+          const tableSelection = (0, import_table2.applyTableHandlers)(
             tableNode,
             tableElement,
             editor,
@@ -2333,20 +2337,20 @@ var LexicalTablePlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE_
         }
       };
       editor.getEditorState().read(() => {
-        const tableNodes = (0, import_lexical11.$nodesOfType)(import_table.TableNode);
+        const tableNodes = (0, import_lexical11.$nodesOfType)(import_table2.TableNode);
         for (const tableNode of tableNodes) {
-          if ((0, import_table.$isTableNode)(tableNode))
+          if ((0, import_table2.$isTableNode)(tableNode))
             initializeTableNode(tableNode);
         }
       });
       const unregisterMutationListener = editor.registerMutationListener(
-        import_table.TableNode,
+        import_table2.TableNode,
         (nodeMutations) => {
           for (const [nodeKey, mutation] of nodeMutations) {
             if (mutation === "created") {
               editor.getEditorState().read(() => {
                 const tableNode = (0, import_lexical11.$getNodeByKey)(nodeKey);
-                if ((0, import_table.$isTableNode)(tableNode))
+                if ((0, import_table2.$isTableNode)(tableNode))
                   initializeTableNode(tableNode);
               });
             } else if (mutation === "destroyed") {
@@ -2368,20 +2372,20 @@ var LexicalTablePlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE_
     useEffect(() => {
       if (props.hasCellMerge)
         return;
-      return editor.registerNodeTransform(import_table.TableCellNode, (node) => {
+      return editor.registerNodeTransform(import_table2.TableCellNode, (node) => {
         if (node.getColSpan() > 1 || node.getRowSpan() > 1) {
           const [, , gridNode] = (0, import_lexical11.DEPRECATED_$getNodeTriplet)(node);
           const [gridMap] = (0, import_lexical11.DEPRECATED_$computeGridMap)(gridNode, node, node);
           const rowsCount = gridMap.length;
           const columnsCount = gridMap[0].length;
           let row = gridNode.getFirstChild();
-          if ((0, import_lexical11.DEPRECATED_$isGridRowNode)(row))
+          if (!(0, import_lexical11.DEPRECATED_$isGridRowNode)(row))
             throw new Error("Expected TableNode first child to be a RowNode");
           const unmerged = [];
           for (let i = 0; i < rowsCount; i++) {
             if (i !== 0) {
               row = row.getNextSibling();
-              if ((0, import_lexical11.DEPRECATED_$isGridRowNode)(row))
+              if (!(0, import_lexical11.DEPRECATED_$isGridRowNode)(row))
                 throw new Error("Expected TableNode first child to be a RowNode");
             }
             let lastRowCell = null;
@@ -2392,11 +2396,14 @@ var LexicalTablePlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE_
                 lastRowCell = cell;
                 unmerged.push(cell);
               } else if (cell.getColSpan() > 1 || cell.getRowSpan() > 1) {
-                const newCell = (0, import_table.$createTableCellNode)(cell.__headerState);
+                if (!(0, import_table2.$isTableCellNode)(cell))
+                  throw new Error("Expected TableNode cell to be a TableCellNode");
+                const newCell = (0, import_table2.$createTableCellNode)(cell.__headerState);
                 if (lastRowCell !== null)
                   lastRowCell.insertAfter(newCell);
-                else
+                else {
                   $insertFirst(row, newCell);
+                }
               }
             }
           }
@@ -2410,7 +2417,7 @@ var LexicalTablePlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE_
     useEffect(() => {
       if (props.hasCellBackgroundColor)
         return;
-      return editor.registerNodeTransform(import_table.TableCellNode, (node) => {
+      return editor.registerNodeTransform(import_table2.TableCellNode, (node) => {
         if (node.getBackgroundColor() !== null)
           node.setBackgroundColor(null);
       });
@@ -2689,7 +2696,7 @@ var LexicalBlockWithAlignableContents_vue_vue_type_script_setup_true_lang_defaul
         event.preventDefault();
         editor.update(() => {
           const node = (0, import_lexical15.$getNodeByKey)(props.nodeKey);
-          if ((0, import_lexical15.$isDecoratorNode)(node) && node.isTopLevel())
+          if ((0, import_lexical15.$isDecoratorNode)(node))
             node?.remove();
           setSelected(false);
         });

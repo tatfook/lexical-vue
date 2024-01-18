@@ -3,12 +3,12 @@ import type { HTMLTableElementWithWithTableSelectionState, InsertTableCommandPay
 import {
   $createTableCellNode,
   $createTableNodeWithDimensions,
+  $isTableCellNode,
   $isTableNode,
   INSERT_TABLE_COMMAND,
   TableCellNode,
   TableNode,
-  TableRowNode,
-  applyTableHandlers,
+  TableRowNode, applyTableHandlers,
 } from '@lexical/table'
 import type {
   DEPRECATED_GridCellNode,
@@ -153,14 +153,14 @@ useEffect(() => {
       const rowsCount = gridMap.length
       const columnsCount = gridMap[0].length
       let row = gridNode.getFirstChild()
-      if (DEPRECATED_$isGridRowNode(row))
+      if (!DEPRECATED_$isGridRowNode(row))
         throw new Error('Expected TableNode first child to be a RowNode')
 
       const unmerged = []
       for (let i = 0; i < rowsCount; i++) {
         if (i !== 0) {
-          row = row!.getNextSibling()
-          if (DEPRECATED_$isGridRowNode(row))
+          row = row.getNextSibling()
+          if (!DEPRECATED_$isGridRowNode(row))
             throw new Error('Expected TableNode first child to be a RowNode')
         }
         let lastRowCell: null | DEPRECATED_GridCellNode = null
@@ -172,12 +172,16 @@ useEffect(() => {
             unmerged.push(cell)
           }
           else if (cell.getColSpan() > 1 || cell.getRowSpan() > 1) {
+            if (!$isTableCellNode(cell))
+              throw new Error('Expected TableNode cell to be a TableCellNode')
+            // @ts-ignore
             const newCell = $createTableCellNode(cell.__headerState)
             if (lastRowCell !== null)
               lastRowCell.insertAfter(newCell)
-
-            else
-              $insertFirst(row as ElementNode, newCell)
+            else {
+              // @ts-ignore
+              $insertFirst(row, newCell)
+            }
           }
         }
       }

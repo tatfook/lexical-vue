@@ -1,4 +1,4 @@
-import type { ElementNode, GridSelection, LexicalEditor, LexicalNode, RangeSelection } from 'lexical'
+import type { ElementNode, LexicalEditor, LexicalNode, RangeSelection } from 'lexical'
 
 import {
   $createOverflowNode,
@@ -15,6 +15,7 @@ import {
   $setSelection,
 } from 'lexical'
 import { useMounted } from './useMounted'
+import { TableSelection } from '@lexical/table'
 
 interface OptionalProps {
   remainingCharacters?: (characters: number) => void
@@ -125,7 +126,7 @@ function $wrapOverflowedNodes(offset: number): void {
         const previousSibling = node.getPreviousSibling()
         const nextSibling = node.getNextSibling()
         $unwrapNode(node)
-        const selection = $getSelection() as RangeSelection | GridSelection
+        const selection = $getSelection() as RangeSelection | TableSelection
         // Restore selection when the overflow children are removed
         if (
           $isRangeSelection(selection)
@@ -220,7 +221,7 @@ export function mergePrevious(overflowNode: OverflowNode): void {
       firstChild.insertBefore(previousNodeChildren[i])
   }
 
-  const selection = $getSelection() as RangeSelection | GridSelection
+  const selection = $getSelection() as RangeSelection | TableSelection
   if ($isRangeSelection(selection)) {
     const anchor = selection.anchor
     const anchorNode = anchor.getNode()

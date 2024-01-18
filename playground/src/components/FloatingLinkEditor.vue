@@ -2,11 +2,12 @@
 import type { LinkNode } from '@lexical/link'
 import { $isLinkNode, TOGGLE_LINK_COMMAND } from '@lexical/link'
 import { mergeRegister } from '@lexical/utils'
-import type { CommandListenerPriority, GridSelection, LexicalNode, NodeSelection, RangeSelection } from 'lexical'
+import type { CommandListenerPriority, LexicalNode, NodeSelection, RangeSelection } from 'lexical'
 import { $getSelection, $isRangeSelection, SELECTION_CHANGE_COMMAND } from 'lexical'
 import { useEditor } from 'lexical-vue'
 import { onMounted, onUnmounted, ref, watchEffect } from 'vue'
 import { getSelectedNode } from '../utils'
+import {TableSelection} from "@lexical/table";
 
 const props = defineProps<{
   priority: CommandListenerPriority
@@ -16,7 +17,7 @@ const inputRef = ref<HTMLInputElement | null>(null)
 const mouseDownRef = ref(false)
 const linkUrl = ref('')
 const isEditMode = ref(false)
-const lastSelection = ref<RangeSelection | NodeSelection | GridSelection | null>(null)
+const lastSelection = ref<RangeSelection | NodeSelection | TableSelection | null>(null)
 
 const editor = useEditor()
 

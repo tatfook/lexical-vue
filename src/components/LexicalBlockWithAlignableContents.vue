@@ -38,7 +38,7 @@ function onDelete(event: KeyboardEvent) {
     event.preventDefault()
     editor.update(() => {
       const node = $getNodeByKey(props.nodeKey)
-      if ($isDecoratorNode(node) && node.isTopLevel())
+      if ($isDecoratorNode(node))
         node?.remove()
 
       setSelected(false)

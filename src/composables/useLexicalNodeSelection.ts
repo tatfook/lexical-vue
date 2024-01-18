@@ -45,10 +45,13 @@ export function useLexicalNodeSelection(
         selection = $createNodeSelection()
         $setSelection(selection)
       }
-      if (selected)
+      if (selected) {
+        // @ts-ignore
         (selection).add(realKeyVal)
-      else
+      } else {
+        // @ts-ignore
         (selection).delete(realKeyVal)
+      }
     })
   }
 

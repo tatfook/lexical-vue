@@ -1,25 +1,26 @@
 <script setup lang="ts">
 import type {
+  BaseSelection,
   EditorState,
   ElementNode,
-  GridSelection,
-  LexicalNode,
-  NodeSelection,
-  RangeSelection,
+  INTERNAL_PointSelection,
+  LexicalNode, RangeSelection,
+  TextNode,
 } from 'lexical'
 
 import { $isMarkNode } from '@lexical/mark'
 import {
   $getRoot,
   $getSelection,
-  $isElementNode,
+  $isElementNode, $isNodeSelection,
   $isRangeSelection,
   $isTextNode,
-  DEPRECATED_$isGridSelection,
 } from 'lexical'
 import { computed, onUnmounted, ref, watchEffect } from 'vue'
 import type { LinkNode } from '@lexical/link'
 import { $isLinkNode } from '@lexical/link'
+import type { GridSelection } from '@lexical/table'
+import { $isGridSelection } from '@lexical/table'
 import { useEditor } from '../composables'
 
 defineProps<{
@@ -69,7 +70,9 @@ function printRangeSelection(selection: RangeSelection): string {
   return res
 }
 
-function printObjectSelection(selection: NodeSelection): string {
+function printNodeSelection(selection: BaseSelection): string {
+  if (!$isNodeSelection(selection))
+    return ''
   return `: node\n  └ [${Array.from(selection._nodes).join(', ')}]`
 }
 
@@ -110,9 +113,9 @@ function generateContent(editorState: EditorState): string {
       ? ': null'
       : $isRangeSelection(selection)
         ? printRangeSelection(selection)
-        : DEPRECATED_$isGridSelection(selection)
+        : $isGridSelection(selection)
           ? printGridSelection(selection)
-          : printObjectSelection(selection)
+          : printNodeSelection(selection)
   })
 
   return `${res}\n selection${selectionString}`
@@ -183,30 +186,30 @@ function printNode(node: LexicalNode) {
 }
 
 const FORMAT_PREDICATES = [
-  (node: LexicalNode | RangeSelection) => node.hasFormat('bold') && 'Bold',
-  (node: LexicalNode | RangeSelection) => node.hasFormat('code') && 'Code',
-  (node: LexicalNode | RangeSelection) => node.hasFormat('italic') && 'Italic',
-  (node: LexicalNode | RangeSelection) =>
+  (node: TextNode | RangeSelection) => node.hasFormat('bold') && 'Bold',
+  (node: TextNode | RangeSelection) => node.hasFormat('code') && 'Code',
+  (node: TextNode | RangeSelection) => node.hasFormat('italic') && 'Italic',
+  (node: TextNode | RangeSelection) =>
     node.hasFormat('strikethrough') && 'Strikethrough',
-  (node: LexicalNode | RangeSelection) =>
+  (node: TextNode | RangeSelection) =>
     node.hasFormat('subscript') && 'Subscript',
-  (node: LexicalNode | RangeSelection) =>
+  (node: TextNode | RangeSelection) =>
     node.hasFormat('superscript') && 'Superscript',
-  (node: LexicalNode | RangeSelection) =>
+  (node: TextNode | RangeSelection) =>
     node.hasFormat('underline') && 'Underline',
 ]
 
 const DETAIL_PREDICATES = [
-  (node: LexicalNode) => node.isDirectionless() && 'Directionless',
-  (node: LexicalNode) => node.isUnmergeable() && 'Unmergeable',
+  (node: TextNode) => node.isDirectionless() && 'Directionless',
+  (node: TextNode) => node.isUnmergeable() && 'Unmergeable',
 ]
 
 const MODE_PREDICATES = [
-  (node: LexicalNode) => node.isToken() && 'Token',
-  (node: LexicalNode) => node.isSegmented() && 'Segmented',
+  (node: TextNode) => node.isToken() && 'Token',
+  (node: TextNode) => node.isSegmented() && 'Segmented',
 ]
 
-function printAllTextNodeProperties(node: LexicalNode) {
+function printAllTextNodeProperties(node: TextNode) {
   return [
     printFormatProperties(node),
     printDetailProperties(node),
@@ -222,7 +225,7 @@ function printAllLinkNodeProperties(node: LinkNode) {
     .join(', ')
 }
 
-function printDetailProperties(nodeOrSelection: LexicalNode) {
+function printDetailProperties(nodeOrSelection: TextNode) {
   let str = DETAIL_PREDICATES.map(predicate => predicate(nodeOrSelection))
     .filter(Boolean)
     .join(', ')
@@ -234,7 +237,7 @@ function printDetailProperties(nodeOrSelection: LexicalNode) {
   return str
 }
 
-function printModeProperties(nodeOrSelection: LexicalNode) {
+function printModeProperties(nodeOrSelection: TextNode) {
   let str = MODE_PREDICATES.map(predicate => predicate(nodeOrSelection))
     .filter(Boolean)
     .join(', ')
@@ -246,7 +249,7 @@ function printModeProperties(nodeOrSelection: LexicalNode) {
   return str
 }
 
-function printFormatProperties(nodeOrSelection: LexicalNode | RangeSelection) {
+function printFormatProperties(nodeOrSelection: TextNode | RangeSelection) {
   let str = FORMAT_PREDICATES.map(predicate => predicate(nodeOrSelection))
     .filter(Boolean)
     .join(', ')
@@ -288,7 +291,7 @@ function printSelectedCharsLine({
   isSelected: boolean
   node: LexicalNode
   nodeKeyDisplay: string
-  selection: GridSelection | NodeSelection | RangeSelection | null
+  selection: BaseSelection | null
   typeDisplay: string
 }) {
   // No selection or node is not selected.
@@ -344,7 +347,7 @@ function printSelectedCharsLine({
 
 function $getSelectionStartEnd(
   node: LexicalNode,
-  selection: RangeSelection | GridSelection,
+  selection: INTERNAL_PointSelection,
 ): [number, number] {
   const anchor = selection.anchor
   const focus = selection.focus
