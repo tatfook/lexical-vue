@@ -93,9 +93,9 @@ function useEffect(cb, options) {
 }
 
 // src/composables/useAutoLink.ts
-function findFirstMatch(text, matchers) {
+function findFirstMatch(textNode, matchers) {
   for (let i = 0; i < matchers.length; i++) {
-    const match = matchers[i](text);
+    const match = matchers[i](textNode);
     if (match)
       return match;
   }
@@ -136,7 +136,7 @@ function handleLinkCreation(node, matchers, onChange) {
   let invalidMatchEnd = 0;
   let remainingTextNode = node;
   let match;
-  while ((match = findFirstMatch(text, matchers)) && match !== null) {
+  while ((match = findFirstMatch(node, matchers)) && match !== null) {
     const matchStart = match.index;
     const matchLength = match.length;
     const matchEnd = matchStart + matchLength;
@@ -184,7 +184,7 @@ function handleLinkEdit(linkNode, matchers, onChange) {
     }
   }
   const text = linkNode.getTextContent();
-  const match = findFirstMatch(text, matchers);
+  const match = findFirstMatch(linkNode, matchers);
   if (match === null || match.text !== text) {
     replaceWithChildren(linkNode);
     onChange(null, linkNode.getURL());

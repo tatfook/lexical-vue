@@ -34,14 +34,14 @@ interface LinkMatcherResult {
   url: string
 }
 
-export type LinkMatcher = (text: string) => LinkMatcherResult | null
+export type LinkMatcher = (textNode: LexicalNode) => LinkMatcherResult | null
 
 function findFirstMatch(
-  text: string,
+  textNode: LexicalNode,
   matchers: Array<LinkMatcher>,
 ): LinkMatcherResult | null {
   for (let i = 0; i < matchers.length; i++) {
-    const match = matchers[i](text)
+    const match = matchers[i](textNode)
 
     if (match)
       return match
@@ -121,7 +121,7 @@ function handleLinkCreation(
   let match
 
   // eslint-disable-next-line no-cond-assign
-  while ((match = findFirstMatch(text, matchers)) && match !== null) {
+  while ((match = findFirstMatch(node, matchers)) && match !== null) {
     const matchStart = match.index
     const matchLength = match.length
     const matchEnd = matchStart + matchLength
@@ -181,7 +181,7 @@ function handleLinkEdit(
 
   // Check text content fully matches
   const text = linkNode.getTextContent()
-  const match = findFirstMatch(text, matchers)
+  const match = findFirstMatch(linkNode, matchers)
   if (match === null || match.text !== text) {
     replaceWithChildren(linkNode)
     onChange(null, linkNode.getURL())
