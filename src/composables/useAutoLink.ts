@@ -121,7 +121,7 @@ function handleLinkCreation(
   let match
 
   // eslint-disable-next-line no-cond-assign
-  while ((match = findFirstMatch(node, matchers)) && match !== null) {
+  while ((match = findFirstMatch(node, matchers)) && match !== null && invalidMatchEnd <= nodeText.length) {
     const matchStart = match.index
     const matchLength = match.length
     const matchEnd = matchStart + matchLength

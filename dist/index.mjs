@@ -65,7 +65,7 @@ function handleLinkCreation(node, matchers, onChange) {
   let invalidMatchEnd = 0;
   let remainingTextNode = node;
   let match;
-  while ((match = findFirstMatch(node, matchers)) && match !== null) {
+  while ((match = findFirstMatch(node, matchers)) && match !== null && invalidMatchEnd <= nodeText.length) {
     const matchStart = match.index;
     const matchLength = match.length;
     const matchEnd = matchStart + matchLength;
