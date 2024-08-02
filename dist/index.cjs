@@ -56,9 +56,9 @@ __export(src_exports, {
   useCharacterLimit: () => useCharacterLimit,
   useDecorators: () => useDecorators,
   useDynamicPositioning: () => useDynamicPositioning,
-  useEditor: () => useEditor,
   useEffect: () => useEffect,
   useHistory: () => useHistory,
+  useLexicalComposer: () => useLexicalComposer,
   useLexicalIsTextContentEmpty: () => useLexicalIsTextContentEmpty,
   useLexicalNodeSelection: () => useLexicalNodeSelection,
   useLexicalTextEntity: () => useLexicalTextEntity,
@@ -518,14 +518,14 @@ function useDecorators(editor) {
   });
 }
 
-// src/composables/useEditor.ts
+// src/composables/useLexicalComposer.ts
 var import_vue6 = require("vue");
 
 // src/composables/inject.ts
 var editorKey = Symbol("Lexical editor");
 
-// src/composables/useEditor.ts
-function useEditor() {
+// src/composables/useLexicalComposer.ts
+function useLexicalComposer() {
   const editor = (0, import_vue6.inject)(editorKey);
   if (!editor)
     throw new Error("<LexicalComposer /> is required");
@@ -577,7 +577,7 @@ function isNodeSelected(editor, key) {
   });
 }
 function useLexicalNodeSelection(key) {
-  const editor = useEditor();
+  const editor = useLexicalComposer();
   const isSelected = (0, import_vue9.ref)(isNodeSelected(editor, (0, import_vue9.unref)(key)));
   (0, import_vue9.watchPostEffect)((onInvalidate) => {
     const unregisterListener = editor.registerUpdateListener(() => {
@@ -620,7 +620,7 @@ function useLexicalNodeSelection(key) {
 var import_text4 = require("@lexical/text");
 var import_utils4 = require("@lexical/utils");
 function useLexicalTextEntity(getMatch, targetNode, createNode) {
-  const editor = useEditor();
+  const editor = useLexicalComposer();
   useMounted(() => {
     return (0, import_utils4.mergeRegister)(
       ...(0, import_text4.registerLexicalTextEntity)(editor, getMatch, targetNode, createNode)
@@ -738,7 +738,7 @@ function useBasicTypeaheadTriggerMatch(trigger, { minLength = 1, maxLength = 75 
   };
 }
 function useMenuAnchorRef(resolution, setResolution, className) {
-  const editor = useEditor();
+  const editor = useLexicalComposer();
   const anchorElementRef = (0, import_vue10.ref)(document.createElement("div"));
   const positionMenu = () => {
     const rootElement = editor.getRootElement();
@@ -815,7 +815,7 @@ function isTriggerVisibleInNearestScrollContainer(targetElement, containerElemen
   return tRect.top > cRect.top && tRect.top < cRect.bottom;
 }
 function useDynamicPositioning(resolution, targetElement, onReposition, onVisibilityChange) {
-  const editor = useEditor();
+  const editor = useLexicalComposer();
   useEffect(() => {
     if ((0, import_vue10.unref)(targetElement) !== null && (0, import_vue10.unref)(resolution) !== null) {
       const rootElement = editor.getRootElement();
@@ -885,7 +885,7 @@ var LexicalPopoverMenu_vue_vue_type_script_setup_true_lang_default = /* @__PURE_
   setup(__props, { emit }) {
     const props = __props;
     const SCROLL_TYPEAHEAD_OPTION_INTO_VIEW_COMMAND = (0, import_lexical5.createCommand)("SCROLL_TYPEAHEAD_OPTION_INTO_VIEW_COMMAND");
-    const editor = useEditor();
+    const editor = useLexicalComposer();
     const selectedIndex = (0, import_vue13.ref)(null);
     (0, import_vue13.watch)(() => props.resolution.match.matchingString, () => {
       selectedIndex.value = 0;
@@ -1111,7 +1111,7 @@ var LexicalTypeaheadMenuPlugin_vue_vue_type_script_setup_true_lang_default = /* 
   emits: ["close", "open", "queryChange", "selectOption"],
   setup(__props, { emit }) {
     const props = __props;
-    const editor = useEditor();
+    const editor = useLexicalComposer();
     const resolution = (0, import_vue16.ref)(null);
     function setResolution(value) {
       resolution.value = value;
@@ -1480,7 +1480,7 @@ var import_vue19 = require("vue");
 var LexicalDecoratedTeleports_default = (0, import_vue19.defineComponent)({
   name: "LexicalDecoratedTeleports",
   setup() {
-    const editor = useEditor();
+    const editor = useLexicalComposer();
     const decorators = useDecorators(editor);
     return () => decorators.value;
   }
@@ -1516,7 +1516,7 @@ var LexicalContentEditable_vue_vue_type_script_setup_true_lang_default = /* @__P
   },
   setup(__props) {
     const root = (0, import_vue22.ref)(null);
-    const editor = useEditor();
+    const editor = useLexicalComposer();
     const editable = (0, import_vue22.ref)(false);
     useMounted(() => {
       if (root.value) {
@@ -1563,7 +1563,7 @@ var import_vue24 = require("vue");
 var LexicalPlainTextPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */ (0, import_vue23.defineComponent)({
   __name: "LexicalPlainTextPlugin",
   setup(__props) {
-    const editor = useEditor();
+    const editor = useLexicalComposer();
     const showPlaceholder = useCanShowPlaceholder(editor);
     usePlainTextSetup(editor);
     return (_ctx, _cache) => {
@@ -1670,7 +1670,7 @@ var LexicalOnChangePlugin_vue_vue_type_script_setup_true_lang_default = /* @__PU
   emits: ["change"],
   setup(__props, { emit }) {
     const props = __props;
-    const editor = useEditor();
+    const editor = useLexicalComposer();
     useMounted(() => {
       return editor.registerUpdateListener(({ editorState, dirtyElements, dirtyLeaves, prevEditorState }) => {
         if (props.ignoreSelectionChange && dirtyElements.size === 0 && dirtyLeaves.size === 0)
@@ -1698,7 +1698,7 @@ var LexicalHistoryPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PUR
   },
   setup(__props) {
     const props = __props;
-    const editor = useEditor();
+    const editor = useLexicalComposer();
     useHistory(editor, props.externalHistoryState);
     return (_ctx, _cache) => {
       return null;
@@ -1764,9 +1764,9 @@ var LexicalTreeViewPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PU
       return `: node
   \u2514 [${Array.from(selection._nodes).join(", ")}]`;
     }
-    function printGridSelection(selection) {
-      return `: grid
-  \u2514 { grid: ${selection.gridKey}, anchorCell: ${selection.anchor.key}, focusCell: ${selection.focus.key} }`;
+    function printTableSelection(selection) {
+      return `: table
+  \u2514 { table: ${selection.tableKey}, anchorCell: ${selection.anchor.key}, focusCell: ${selection.focus.key} }`;
     }
     function generateContent(editorState) {
       let res = " root\n";
@@ -1791,7 +1791,7 @@ var LexicalTreeViewPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PU
             typeDisplay
           });
         });
-        return selection === null ? ": null" : (0, import_lexical9.$isRangeSelection)(selection) ? printRangeSelection(selection) : (0, import_table.$isGridSelection)(selection) ? printGridSelection(selection) : printNodeSelection(selection);
+        return selection === null ? ": null" : (0, import_lexical9.$isRangeSelection)(selection) ? printRangeSelection(selection) : (0, import_table.$isTableSelection)(selection) ? printTableSelection(selection) : printNodeSelection(selection);
       });
       return `${res}
  selection${selectionString}`;
@@ -1931,8 +1931,10 @@ var LexicalTreeViewPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PU
 `;
     }
     function $getSelectionStartEnd(node, selection) {
-      const anchor = selection.anchor;
-      const focus = selection.focus;
+      const anchorAndFocus = selection.getStartEndPoints();
+      if ((0, import_lexical9.$isNodeSelection)(selection) || anchorAndFocus === null)
+        return [-1, -1];
+      const [anchor, focus] = anchorAndFocus;
       const textContent = node.getTextContent();
       const textLength = textContent.length;
       let start = -1;
@@ -1957,7 +1959,7 @@ var LexicalTreeViewPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PU
         end + numNonSingleWidthCharBeforeSelection + numNonSingleWidthCharInSelection
       ];
     }
-    const editor = useEditor();
+    const editor = useLexicalComposer();
     const timeStampedEditorStates = (0, import_vue32.ref)([]);
     const content = (0, import_vue32.ref)("");
     const timeTravelEnabled = (0, import_vue32.ref)(false);
@@ -2146,7 +2148,7 @@ var LexicalAutoFocusPlugin_vue_vue_type_script_setup_true_lang_default = /* @__P
   },
   setup(__props) {
     const props = __props;
-    const editor = useEditor();
+    const editor = useLexicalComposer();
     (0, import_vue34.onMounted)(() => {
       (0, import_vue34.nextTick)(() => {
         editor.focus(
@@ -2176,7 +2178,7 @@ var import_vue36 = require("vue");
 var LexicalRichTextPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */ (0, import_vue35.defineComponent)({
   __name: "LexicalRichTextPlugin",
   setup(__props) {
-    const editor = useEditor();
+    const editor = useLexicalComposer();
     const showPlaceholder = useCanShowPlaceholder(editor);
     useRichTextSetup(editor);
     return (_ctx, _cache) => {
@@ -2203,7 +2205,7 @@ var import_vue37 = require("vue");
 var LexicalListPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */ (0, import_vue37.defineComponent)({
   __name: "LexicalListPlugin",
   setup(__props) {
-    const editor = useEditor();
+    const editor = useLexicalComposer();
     useList(editor);
     return (_ctx, _cache) => {
       return null;
@@ -2224,7 +2226,7 @@ var LexicalAutoLinkPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PU
   emits: ["change"],
   setup(__props, { emit }) {
     const props = __props;
-    const editor = useEditor();
+    const editor = useLexicalComposer();
     useAutoLink(editor, props.matchers, (url, prevUrl) => {
       emit("change", {
         url,
@@ -2247,7 +2249,7 @@ var import_lexical10 = require("lexical");
 var LexicalLinkPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */ (0, import_vue39.defineComponent)({
   __name: "LexicalLinkPlugin",
   setup(__props) {
-    const editor = useEditor();
+    const editor = useLexicalComposer();
     useMounted(() => {
       if (!editor.hasNodes([import_link3.LinkNode]))
         throw new Error("LinkPlugin: LinkNode not registered on editor");
@@ -2277,8 +2279,8 @@ var LexicalLinkPlugin_default = /* @__PURE__ */ export_helper_default(LexicalLin
 // unplugin-vue:/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalTablePlugin.vue?vue&type=script&setup=true&lang.ts
 var import_vue40 = require("vue");
 var import_table2 = require("@lexical/table");
-var import_lexical11 = require("lexical");
 var import_utils10 = require("@lexical/utils");
+var import_lexical11 = require("lexical");
 var LexicalTablePlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */ (0, import_vue40.defineComponent)({
   __name: "LexicalTablePlugin",
   props: {
@@ -2288,7 +2290,7 @@ var LexicalTablePlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE_
   },
   setup(__props) {
     const props = __props;
-    const editor = useEditor();
+    const editor = useLexicalComposer();
     function $insertFirst(parent, node) {
       const firstChild = parent.getFirstChild();
       if (firstChild !== null)
@@ -2374,18 +2376,18 @@ var LexicalTablePlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE_
         return;
       return editor.registerNodeTransform(import_table2.TableCellNode, (node) => {
         if (node.getColSpan() > 1 || node.getRowSpan() > 1) {
-          const [, , gridNode] = (0, import_lexical11.DEPRECATED_$getNodeTriplet)(node);
-          const [gridMap] = (0, import_lexical11.DEPRECATED_$computeGridMap)(gridNode, node, node);
+          const [, , gridNode] = (0, import_table2.$getNodeTriplet)(node);
+          const [gridMap] = (0, import_table2.$computeTableMap)(gridNode, node, node);
           const rowsCount = gridMap.length;
           const columnsCount = gridMap[0].length;
           let row = gridNode.getFirstChild();
-          if (!(0, import_lexical11.DEPRECATED_$isGridRowNode)(row))
+          if (!(0, import_table2.$isTableRowNode)(row))
             throw new Error("Expected TableNode first child to be a RowNode");
           const unmerged = [];
           for (let i = 0; i < rowsCount; i++) {
             if (i !== 0) {
               row = row.getNextSibling();
-              if (!(0, import_lexical11.DEPRECATED_$isGridRowNode)(row))
+              if (!(0, import_table2.$isTableRowNode)(row))
                 throw new Error("Expected TableNode first child to be a RowNode");
             }
             let lastRowCell = null;
@@ -2401,9 +2403,8 @@ var LexicalTablePlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE_
                 const newCell = (0, import_table2.$createTableCellNode)(cell.__headerState);
                 if (lastRowCell !== null)
                   lastRowCell.insertAfter(newCell);
-                else {
+                else
                   $insertFirst(row, newCell);
-                }
               }
             }
           }
@@ -2439,7 +2440,7 @@ var LexicalClearEditorPlugin_vue_vue_type_script_setup_true_lang_default = /* @_
   __name: "LexicalClearEditorPlugin",
   emits: ["clear"],
   setup(__props, { emit }) {
-    const editor = useEditor();
+    const editor = useLexicalComposer();
     const attrs = (0, import_vue42.useAttrs)();
     useMounted(() => {
       const emitExists = Boolean(attrs.onClear);
@@ -2485,7 +2486,7 @@ var LexicalCharacterLimitPlugin_vue_vue_type_script_setup_true_lang_default = /*
   },
   setup(__props) {
     const props = __props;
-    const editor = useEditor();
+    const editor = useLexicalComposer();
     let textEncoderInstance = null;
     function textEncoder() {
       if (window.TextEncoder === void 0)
@@ -2547,7 +2548,7 @@ var LexicalAutoScrollPlugin_vue_vue_type_script_setup_true_lang_default = /* @__
   },
   setup(__props) {
     const props = __props;
-    const editor = useEditor();
+    const editor = useLexicalComposer();
     useMounted(() => {
       return editor.registerUpdateListener(({ tags, editorState }) => {
         const scrollElement = props.scrollRef;
@@ -2614,7 +2615,7 @@ var LexicalHashtagPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PUR
       return hashtag;
     }
     const REGEX = new RegExp(getHashtagRegexString(), "i");
-    const editor = useEditor();
+    const editor = useLexicalComposer();
     (0, import_vue48.onMounted)(() => {
       if (!editor.hasNodes([import_hashtag.HashtagNode]))
         throw new Error("HashtagPlugin: HashtagNode not registered on editor");
@@ -2688,7 +2689,7 @@ var LexicalBlockWithAlignableContents_vue_vue_type_script_setup_true_lang_defaul
   },
   setup(__props) {
     const props = __props;
-    const editor = useEditor();
+    const editor = useLexicalComposer();
     const { isSelected, setSelected, clearSelection } = useLexicalNodeSelection(props.nodeKey);
     const containerRef = (0, import_vue51.ref)(null);
     function onDelete(event) {
@@ -2805,7 +2806,7 @@ function registerClickAndPointerListeners(register, unregister) {
 var LexicalCheckListPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */ (0, import_vue52.defineComponent)({
   __name: "LexicalCheckListPlugin",
   setup(__props) {
-    const editor = useEditor();
+    const editor = useLexicalComposer();
     useMounted(() => {
       return (0, import_utils12.mergeRegister)(
         editor.registerCommand(
@@ -3012,7 +3013,7 @@ var LexicalMarkdownShortcutPlugin_vue_vue_type_script_setup_true_lang_default = 
   },
   setup(__props) {
     const props = __props;
-    const editor = useEditor();
+    const editor = useLexicalComposer();
     useMounted(() => {
       return (0, import_markdown.registerMarkdownShortcuts)(editor, props.transformers);
     });
@@ -3031,7 +3032,7 @@ var import_lexical17 = require("lexical");
 var LexicalTabIndentationPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */ (0, import_vue54.defineComponent)({
   __name: "LexicalTabIndentationPlugin",
   setup(__props) {
-    const editor = useEditor();
+    const editor = useLexicalComposer();
     useMounted(() => {
       return editor.registerCommand(
         import_lexical17.KEY_TAB_COMMAND,
@@ -3113,7 +3114,7 @@ var LexicalCollaborationPlugin_vue_vue_type_script_setup_true_lang_default = /* 
       if (props.cursorColor !== void 0)
         useCollaborationContext_default.value.color = props.cursorColor;
     });
-    const editor = useEditor();
+    const editor = useLexicalComposer();
     useEffect(() => {
       useCollaborationContext_default.value.isCollabActive = true;
       return () => {
@@ -3203,9 +3204,9 @@ var LexicalCollaborationPlugin_default = /* @__PURE__ */ export_helper_default(L
   useCharacterLimit,
   useDecorators,
   useDynamicPositioning,
-  useEditor,
   useEffect,
   useHistory,
+  useLexicalComposer,
   useLexicalIsTextContentEmpty,
   useLexicalNodeSelection,
   useLexicalTextEntity,

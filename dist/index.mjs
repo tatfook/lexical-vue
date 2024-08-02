@@ -1,13 +1,13 @@
 // src/composables/useAutoLink.ts
 import { unref } from "vue";
-import _defaultImport from "@lexical/link";
+import * as _defaultImport from "@lexical/link";
 const AutoLinkNode = _defaultImport.AutoLinkNode;
 const $isLinkNode = _defaultImport.$isLinkNode;
 const $isAutoLinkNode = _defaultImport.$isAutoLinkNode;
 const $createAutoLinkNode = _defaultImport.$createAutoLinkNode;
-import _defaultImport2 from "@lexical/utils";
+import * as _defaultImport2 from "@lexical/utils";
 const mergeRegister = _defaultImport2.mergeRegister;
-import _defaultImport3 from "lexical";
+import * as _defaultImport3 from "lexical";
 // src/composables/useEffect.ts
 const TextNode = _defaultImport3.TextNode;
 const $isTextNode = _defaultImport3.$isTextNode;
@@ -176,9 +176,9 @@ function useAutoLink(editor, matchers, onChange) {
 
 // src/composables/useCanShowPlaceholder.ts
 import { readonly, ref } from "vue";
-import _defaultImport4 from "@lexical/text";
+import * as _defaultImport4 from "@lexical/text";
 const $canShowPlaceholderCurry = _defaultImport4.$canShowPlaceholderCurry;
-import _defaultImport5 from "@lexical/utils";
+import * as _defaultImport5 from "@lexical/utils";
 // src/composables/useMounted.ts
 const mergeRegister2 = _defaultImport5.mergeRegister;
 import { onMounted, onUnmounted } from "vue";
@@ -215,16 +215,16 @@ function useCanShowPlaceholder(editor) {
 }
 
 // src/composables/useCharacterLimit.ts
-import _defaultImport6 from "@lexical/overflow";
+import * as _defaultImport6 from "@lexical/overflow";
 const OverflowNode = _defaultImport6.OverflowNode;
 const $isOverflowNode = _defaultImport6.$isOverflowNode;
 const $createOverflowNode = _defaultImport6.$createOverflowNode;
-import _defaultImport7 from "@lexical/text";
+import * as _defaultImport7 from "@lexical/text";
 const $rootTextContent = _defaultImport7.$rootTextContent;
-import _defaultImport8 from "@lexical/utils";
+import * as _defaultImport8 from "@lexical/utils";
 const mergeRegister3 = _defaultImport8.mergeRegister;
 const $dfs = _defaultImport8.$dfs;
-import _defaultImport9 from "lexical";
+import * as _defaultImport9 from "lexical";
 const $setSelection = _defaultImport9.$setSelection;
 const $isTextNode2 = _defaultImport9.$isTextNode;
 const $isRangeSelection = _defaultImport9.$isRangeSelection;
@@ -410,14 +410,14 @@ function useDecorators(editor) {
   });
 }
 
-// src/composables/useEditor.ts
+// src/composables/useLexicalComposer.ts
 import { inject } from "vue";
 
 // src/composables/inject.ts
 var editorKey = Symbol("Lexical editor");
 
-// src/composables/useEditor.ts
-function useEditor() {
+// src/composables/useLexicalComposer.ts
+function useLexicalComposer() {
   const editor = inject(editorKey);
   if (!editor) throw new Error("<LexicalComposer /> is required");
   return editor;
@@ -425,7 +425,7 @@ function useEditor() {
 
 // src/composables/useHistory.ts
 import { computed as computed2, unref as unref3, watchPostEffect } from "vue";
-import _defaultImport10 from "@lexical/history";
+import * as _defaultImport10 from "@lexical/history";
 const registerHistory = _defaultImport10.registerHistory;
 const createEmptyHistoryState = _defaultImport10.createEmptyHistoryState;
 function useHistory(editor, externalHistoryState, delay) {
@@ -440,7 +440,7 @@ function useHistory(editor, externalHistoryState, delay) {
 
 // src/composables/useLexicalIsTextContentEmpty.ts
 import { readonly as readonly2, ref as ref3 } from "vue";
-import _defaultImport11 from "@lexical/text";
+import * as _defaultImport11 from "@lexical/text";
 const $isRootTextContentEmptyCurry = _defaultImport11.$isRootTextContentEmptyCurry;
 function useLexicalIsTextContentEmpty(editor, trim) {
   const isEmpty = ref3(editor.getEditorState().read($isRootTextContentEmptyCurry(editor.isComposing(), trim)));
@@ -456,7 +456,7 @@ function useLexicalIsTextContentEmpty(editor, trim) {
 }
 
 // src/composables/useLexicalNodeSelection.ts
-import _defaultImport12 from "lexical";
+import * as _defaultImport12 from "lexical";
 const $setSelection2 = _defaultImport12.$setSelection;
 const $isNodeSelection = _defaultImport12.$isNodeSelection;
 const $getSelection2 = _defaultImport12.$getSelection;
@@ -471,7 +471,7 @@ function isNodeSelected(editor, key) {
   });
 }
 function useLexicalNodeSelection(key) {
-  const editor = useEditor();
+  const editor = useLexicalComposer();
   const isSelected = ref4(isNodeSelected(editor, unref4(key)));
   watchPostEffect2(onInvalidate => {
     const unregisterListener = editor.registerUpdateListener(() => {
@@ -510,28 +510,28 @@ function useLexicalNodeSelection(key) {
 }
 
 // src/composables/useLexicalTextEntity.ts
-import _defaultImport13 from "@lexical/text";
+import * as _defaultImport13 from "@lexical/text";
 const registerLexicalTextEntity = _defaultImport13.registerLexicalTextEntity;
-import _defaultImport14 from "@lexical/utils";
+import * as _defaultImport14 from "@lexical/utils";
 const mergeRegister4 = _defaultImport14.mergeRegister;
 function useLexicalTextEntity(getMatch, targetNode, createNode) {
-  const editor = useEditor();
+  const editor = useLexicalComposer();
   useMounted(() => {
     return mergeRegister4(...registerLexicalTextEntity(editor, getMatch, targetNode, createNode));
   });
 }
 
 // src/composables/useList.ts
-import _defaultImport15 from "@lexical/list";
+import * as _defaultImport15 from "@lexical/list";
 const removeList = _defaultImport15.removeList;
 const insertList = _defaultImport15.insertList;
 const REMOVE_LIST_COMMAND = _defaultImport15.REMOVE_LIST_COMMAND;
 const INSERT_UNORDERED_LIST_COMMAND = _defaultImport15.INSERT_UNORDERED_LIST_COMMAND;
 const INSERT_ORDERED_LIST_COMMAND = _defaultImport15.INSERT_ORDERED_LIST_COMMAND;
 const $handleListInsertParagraph = _defaultImport15.$handleListInsertParagraph;
-import _defaultImport16 from "@lexical/utils";
+import * as _defaultImport16 from "@lexical/utils";
 const mergeRegister5 = _defaultImport16.mergeRegister;
-import _defaultImport17 from "lexical";
+import * as _defaultImport17 from "lexical";
 const INSERT_PARAGRAPH_COMMAND = _defaultImport17.INSERT_PARAGRAPH_COMMAND;
 const COMMAND_PRIORITY_LOW = _defaultImport17.COMMAND_PRIORITY_LOW;
 function useList(editor) {
@@ -554,11 +554,11 @@ function useList(editor) {
 }
 
 // src/composables/usePlainTextSetup.ts
-import _defaultImport18 from "@lexical/dragon";
+import * as _defaultImport18 from "@lexical/dragon";
 const registerDragonSupport = _defaultImport18.registerDragonSupport;
-import _defaultImport19 from "@lexical/plain-text";
+import * as _defaultImport19 from "@lexical/plain-text";
 const registerPlainText = _defaultImport19.registerPlainText;
-import _defaultImport20 from "@lexical/utils";
+import * as _defaultImport20 from "@lexical/utils";
 const mergeRegister6 = _defaultImport20.mergeRegister;
 function usePlainTextSetup(editor) {
   useMounted(() => {
@@ -567,11 +567,11 @@ function usePlainTextSetup(editor) {
 }
 
 // src/composables/useRichTextSetup.ts
-import _defaultImport21 from "@lexical/dragon";
+import * as _defaultImport21 from "@lexical/dragon";
 const registerDragonSupport2 = _defaultImport21.registerDragonSupport;
-import _defaultImport22 from "@lexical/rich-text";
+import * as _defaultImport22 from "@lexical/rich-text";
 const registerRichText = _defaultImport22.registerRichText;
-import _defaultImport23 from "@lexical/utils";
+import * as _defaultImport23 from "@lexical/utils";
 const mergeRegister7 = _defaultImport23.mergeRegister;
 function useRichTextSetup(editor) {
   useMounted(() => {
@@ -617,7 +617,7 @@ function useBasicTypeaheadTriggerMatch(trigger, {
   };
 }
 function useMenuAnchorRef(resolution, setResolution, className) {
-  const editor = useEditor();
+  const editor = useLexicalComposer();
   const anchorElementRef = ref5(document.createElement("div"));
   const positionMenu = () => {
     const rootElement = editor.getRootElement();
@@ -685,7 +685,7 @@ function isTriggerVisibleInNearestScrollContainer(targetElement, containerElemen
   return tRect.top > cRect.top && tRect.top < cRect.bottom;
 }
 function useDynamicPositioning(resolution, targetElement, onReposition, onVisibilityChange) {
-  const editor = useEditor();
+  const editor = useLexicalComposer();
   useEffect(() => {
     if (unref5(targetElement) !== null && unref5(resolution) !== null) {
       const rootElement = editor.getRootElement();
@@ -728,7 +728,7 @@ import { defineComponent, h as h2 } from "vue";
 // unplugin-vue:/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalTypeaheadMenuPlugin.vue?vue&type=script&setup=true&lang.ts
 import { defineComponent as _defineComponent2 } from "vue";
 import { unref as _unref, normalizeProps as _normalizeProps, guardReactiveProps as _guardReactiveProps, renderSlot as _renderSlot2, withCtx as _withCtx, openBlock as _openBlock, createBlock as _createBlock, createCommentVNode as _createCommentVNode } from "vue";
-import _defaultImport24 from "lexical";
+import * as _defaultImport24 from "lexical";
 const $isTextNode3 = _defaultImport24.$isTextNode;
 const $isRangeSelection3 = _defaultImport24.$isRangeSelection;
 const $getSelection4 = _defaultImport24.$getSelection;
@@ -737,9 +737,9 @@ import { ref as ref7 } from "vue";
 // unplugin-vue:/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalPopoverMenu.vue?vue&type=script&setup=true&lang.ts
 import { defineComponent as _defineComponent } from "vue";
 import { renderSlot as _renderSlot } from "vue";
-import _defaultImport25 from "@lexical/utils";
+import * as _defaultImport25 from "@lexical/utils";
 const mergeRegister8 = _defaultImport25.mergeRegister;
-import _defaultImport26 from "lexical";
+import * as _defaultImport26 from "lexical";
 const createCommand = _defaultImport26.createCommand;
 const KEY_TAB_COMMAND = _defaultImport26.KEY_TAB_COMMAND;
 const KEY_ESCAPE_COMMAND = _defaultImport26.KEY_ESCAPE_COMMAND;
@@ -772,7 +772,7 @@ var LexicalPopoverMenu_vue_vue_type_script_setup_true_lang_default = /* @__PURE_
   }) {
     const props = __props;
     const SCROLL_TYPEAHEAD_OPTION_INTO_VIEW_COMMAND = createCommand("SCROLL_TYPEAHEAD_OPTION_INTO_VIEW_COMMAND");
-    const editor = useEditor();
+    const editor = useLexicalComposer();
     const selectedIndex = ref6(null);
     watch(() => props.resolution.match.matchingString, () => {
       selectedIndex.value = 0;
@@ -949,7 +949,7 @@ var LexicalTypeaheadMenuPlugin_vue_vue_type_script_setup_true_lang_default = /* 
     emit
   }) {
     const props = __props;
-    const editor = useEditor();
+    const editor = useLexicalComposer();
     const resolution = ref7(null);
     function setResolution(value) {
       resolution.value = value;
@@ -1066,9 +1066,9 @@ function useLexicalTypeaheadMenuPlugin() {
 }
 
 // src/composables/useYjsCollaboration.ts
-import _defaultImport27 from "@lexical/utils";
+import * as _defaultImport27 from "@lexical/utils";
 const mergeRegister9 = _defaultImport27.mergeRegister;
-import _defaultImport28 from "@lexical/yjs";
+import * as _defaultImport28 from "@lexical/yjs";
 const syncYjsChangesToLexical = _defaultImport28.syncYjsChangesToLexical;
 const syncLexicalUpdateToYjs = _defaultImport28.syncLexicalUpdateToYjs;
 const syncCursorPositions = _defaultImport28.syncCursorPositions;
@@ -1078,7 +1078,7 @@ const createUndoManager = _defaultImport28.createUndoManager;
 const createBinding = _defaultImport28.createBinding;
 const TOGGLE_CONNECT_COMMAND = _defaultImport28.TOGGLE_CONNECT_COMMAND;
 const CONNECTED_COMMAND = _defaultImport28.CONNECTED_COMMAND;
-import _defaultImport29 from "lexical";
+import * as _defaultImport29 from "lexical";
 const UNDO_COMMAND = _defaultImport29.UNDO_COMMAND;
 const REDO_COMMAND = _defaultImport29.REDO_COMMAND;
 const FOCUS_COMMAND = _defaultImport29.FOCUS_COMMAND;
@@ -1287,7 +1287,7 @@ import { defineComponent as defineComponent2 } from "vue";
 var LexicalDecoratedTeleports_default = defineComponent2({
   name: "LexicalDecoratedTeleports",
   setup() {
-    const editor = useEditor();
+    const editor = useLexicalComposer();
     const decorators = useDecorators(editor);
     return () => decorators.value;
   }
@@ -1382,7 +1382,7 @@ var LexicalContentEditable_vue_vue_type_script_setup_true_lang_default = /* @__P
   },
   setup(__props) {
     const root = ref9(null);
-    const editor = useEditor();
+    const editor = useLexicalComposer();
     const editable = ref9(false);
     useMounted(() => {
       if (root.value) {
@@ -1429,7 +1429,7 @@ import { unref as _unref2, renderSlot as _renderSlot3, createCommentVNode as _cr
 var LexicalPlainTextPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */_defineComponent4({
   __name: "LexicalPlainTextPlugin",
   setup(__props) {
-    const editor = useEditor();
+    const editor = useLexicalComposer();
     const showPlaceholder = useCanShowPlaceholder(editor);
     usePlainTextSetup(editor);
     return (_ctx, _cache) => {
@@ -1448,7 +1448,7 @@ var LexicalPlainTextPlugin_default = /* @__PURE__ */export_helper_default(Lexica
 import { defineComponent as _defineComponent5 } from "vue";
 import { renderSlot as _renderSlot4 } from "vue";
 import { onMounted as onMounted2, provide } from "vue";
-import _defaultImport30 from "lexical";
+import * as _defaultImport30 from "lexical";
 const createEditor = _defaultImport30.createEditor;
 const $getSelection6 = _defaultImport30.$getSelection;
 const $getRoot2 = _defaultImport30.$getRoot;
@@ -1550,7 +1550,7 @@ var LexicalOnChangePlugin_vue_vue_type_script_setup_true_lang_default = /* @__PU
     emit
   }) {
     const props = __props;
-    const editor = useEditor();
+    const editor = useLexicalComposer();
     useMounted(() => {
       return editor.registerUpdateListener(({
         editorState,
@@ -1584,7 +1584,7 @@ var LexicalHistoryPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PUR
   },
   setup(__props) {
     const props = __props;
-    const editor = useEditor();
+    const editor = useLexicalComposer();
     useHistory(editor, props.externalHistoryState);
     return (_ctx, _cache) => {
       return null;
@@ -1598,9 +1598,9 @@ var LexicalHistoryPlugin_default = /* @__PURE__ */export_helper_default(LexicalH
 // unplugin-vue:/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalTreeViewPlugin.vue?vue&type=script&setup=true&lang.ts
 import { defineComponent as _defineComponent8 } from "vue";
 import { normalizeClass as _normalizeClass, openBlock as _openBlock4, createElementBlock as _createElementBlock3, createCommentVNode as _createCommentVNode3, toDisplayString as _toDisplayString, createElementVNode as _createElementVNode } from "vue";
-import _defaultImport31 from "@lexical/mark";
+import * as _defaultImport31 from "@lexical/mark";
 const $isMarkNode = _defaultImport31.$isMarkNode;
-import _defaultImport32 from "lexical";
+import * as _defaultImport32 from "lexical";
 const $isTextNode4 = _defaultImport32.$isTextNode;
 const $isRangeSelection4 = _defaultImport32.$isRangeSelection;
 const $isNodeSelection2 = _defaultImport32.$isNodeSelection;
@@ -1608,10 +1608,10 @@ const $isElementNode2 = _defaultImport32.$isElementNode;
 const $getSelection7 = _defaultImport32.$getSelection;
 const $getRoot3 = _defaultImport32.$getRoot;
 import { computed as computed5, onUnmounted as onUnmounted2, ref as ref10, watchEffect as watchEffect2 } from "vue";
-import _defaultImport33 from "@lexical/link";
+import * as _defaultImport33 from "@lexical/link";
 const $isLinkNode2 = _defaultImport33.$isLinkNode;
-import _defaultImport34 from "@lexical/table";
-const $isGridSelection = _defaultImport34.$isGridSelection;
+import * as _defaultImport34 from "@lexical/table";
+const $isTableSelection = _defaultImport34.$isTableSelection;
 var _hoisted_12 = ["max"];
 var LexicalTreeViewPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */_defineComponent8({
   __name: "LexicalTreeViewPlugin",
@@ -1670,9 +1670,9 @@ var LexicalTreeViewPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PU
       return `: node
   \u2514 [${Array.from(selection._nodes).join(", ")}]`;
     }
-    function printGridSelection(selection) {
-      return `: grid
-  \u2514 { grid: ${selection.gridKey}, anchorCell: ${selection.anchor.key}, focusCell: ${selection.focus.key} }`;
+    function printTableSelection(selection) {
+      return `: table
+  \u2514 { table: ${selection.tableKey}, anchorCell: ${selection.anchor.key}, focusCell: ${selection.focus.key} }`;
     }
     function generateContent(editorState) {
       let res = " root\n";
@@ -1695,7 +1695,7 @@ var LexicalTreeViewPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PU
             typeDisplay
           });
         });
-        return selection === null ? ": null" : $isRangeSelection4(selection) ? printRangeSelection(selection) : $isGridSelection(selection) ? printGridSelection(selection) : printNodeSelection(selection);
+        return selection === null ? ": null" : $isRangeSelection4(selection) ? printRangeSelection(selection) : $isTableSelection(selection) ? printTableSelection(selection) : printNodeSelection(selection);
       });
       return `${res}
  selection${selectionString}`;
@@ -1786,8 +1786,9 @@ var LexicalTreeViewPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PU
 `;
     }
     function $getSelectionStartEnd(node, selection) {
-      const anchor = selection.anchor;
-      const focus = selection.focus;
+      const anchorAndFocus = selection.getStartEndPoints();
+      if ($isNodeSelection2(selection) || anchorAndFocus === null) return [-1, -1];
+      const [anchor, focus] = anchorAndFocus;
       const textContent = node.getTextContent();
       const textLength = textContent.length;
       let start = -1;
@@ -1809,7 +1810,7 @@ var LexicalTreeViewPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PU
       const numNonSingleWidthCharInSelection = (textContent.slice(start, end).match(NON_SINGLE_WIDTH_CHARS_REGEX) || []).length;
       return [start + numNonSingleWidthCharBeforeSelection, end + numNonSingleWidthCharBeforeSelection + numNonSingleWidthCharInSelection];
     }
-    const editor = useEditor();
+    const editor = useLexicalComposer();
     const timeStampedEditorStates = ref10([]);
     const content = ref10("");
     const timeTravelEnabled = ref10(false);
@@ -1960,7 +1961,7 @@ var LexicalAutoFocusPlugin_vue_vue_type_script_setup_true_lang_default = /* @__P
   },
   setup(__props) {
     const props = __props;
-    const editor = useEditor();
+    const editor = useLexicalComposer();
     onMounted3(() => {
       nextTick(() => {
         editor.focus(() => {
@@ -1991,7 +1992,7 @@ import { unref as _unref3, renderSlot as _renderSlot5, createCommentVNode as _cr
 var LexicalRichTextPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */_defineComponent10({
   __name: "LexicalRichTextPlugin",
   setup(__props) {
-    const editor = useEditor();
+    const editor = useLexicalComposer();
     const showPlaceholder = useCanShowPlaceholder(editor);
     useRichTextSetup(editor);
     return (_ctx, _cache) => {
@@ -2011,7 +2012,7 @@ import { defineComponent as _defineComponent11 } from "vue";
 var LexicalListPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */_defineComponent11({
   __name: "LexicalListPlugin",
   setup(__props) {
-    const editor = useEditor();
+    const editor = useLexicalComposer();
     useList(editor);
     return (_ctx, _cache) => {
       return null;
@@ -2037,7 +2038,7 @@ var LexicalAutoLinkPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PU
     emit
   }) {
     const props = __props;
-    const editor = useEditor();
+    const editor = useLexicalComposer();
     useAutoLink(editor, props.matchers, (url, prevUrl) => {
       emit("change", {
         url,
@@ -2055,16 +2056,16 @@ var LexicalAutoLinkPlugin_default = /* @__PURE__ */export_helper_default(Lexical
 
 // unplugin-vue:/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalLinkPlugin.vue?vue&type=script&setup=true&lang.ts
 import { defineComponent as _defineComponent13 } from "vue";
-import _defaultImport35 from "@lexical/link";
+import * as _defaultImport35 from "@lexical/link";
 const toggleLink = _defaultImport35.toggleLink;
 const TOGGLE_LINK_COMMAND = _defaultImport35.TOGGLE_LINK_COMMAND;
 const LinkNode = _defaultImport35.LinkNode;
-import _defaultImport36 from "lexical";
+import * as _defaultImport36 from "lexical";
 const COMMAND_PRIORITY_EDITOR2 = _defaultImport36.COMMAND_PRIORITY_EDITOR;
 var LexicalLinkPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */_defineComponent13({
   __name: "LexicalLinkPlugin",
   setup(__props) {
-    const editor = useEditor();
+    const editor = useLexicalComposer();
     useMounted(() => {
       if (!editor.hasNodes([LinkNode])) throw new Error("LinkPlugin: LinkNode not registered on editor");
       return editor.registerCommand(TOGGLE_LINK_COMMAND, payload => {
@@ -2095,26 +2096,26 @@ var LexicalLinkPlugin_default = /* @__PURE__ */export_helper_default(LexicalLink
 
 // unplugin-vue:/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalTablePlugin.vue?vue&type=script&setup=true&lang.ts
 import { defineComponent as _defineComponent14 } from "vue";
-import _defaultImport37 from "@lexical/table";
+import * as _defaultImport37 from "@lexical/table";
 const applyTableHandlers = _defaultImport37.applyTableHandlers;
 const TableRowNode = _defaultImport37.TableRowNode;
 const TableNode = _defaultImport37.TableNode;
 const TableCellNode = _defaultImport37.TableCellNode;
 const INSERT_TABLE_COMMAND = _defaultImport37.INSERT_TABLE_COMMAND;
+const $isTableRowNode = _defaultImport37.$isTableRowNode;
 const $isTableNode = _defaultImport37.$isTableNode;
 const $isTableCellNode = _defaultImport37.$isTableCellNode;
+const $getNodeTriplet = _defaultImport37.$getNodeTriplet;
 const $createTableNodeWithDimensions = _defaultImport37.$createTableNodeWithDimensions;
 const $createTableCellNode = _defaultImport37.$createTableCellNode;
-import _defaultImport38 from "lexical";
-const DEPRECATED_$isGridRowNode = _defaultImport38.DEPRECATED_$isGridRowNode;
-const DEPRECATED_$getNodeTriplet = _defaultImport38.DEPRECATED_$getNodeTriplet;
-const DEPRECATED_$computeGridMap = _defaultImport38.DEPRECATED_$computeGridMap;
-const COMMAND_PRIORITY_EDITOR3 = _defaultImport38.COMMAND_PRIORITY_EDITOR;
-const $nodesOfType = _defaultImport38.$nodesOfType;
-const $isTextNode5 = _defaultImport38.$isTextNode;
-const $getNodeByKey2 = _defaultImport38.$getNodeByKey;
-import _defaultImport39 from "@lexical/utils";
-const $insertNodeToNearestRoot = _defaultImport39.$insertNodeToNearestRoot;
+const $computeTableMap = _defaultImport37.$computeTableMap;
+import * as _defaultImport38 from "@lexical/utils";
+const $insertNodeToNearestRoot = _defaultImport38.$insertNodeToNearestRoot;
+import * as _defaultImport39 from "lexical";
+const COMMAND_PRIORITY_EDITOR3 = _defaultImport39.COMMAND_PRIORITY_EDITOR;
+const $nodesOfType = _defaultImport39.$nodesOfType;
+const $isTextNode5 = _defaultImport39.$isTextNode;
+const $getNodeByKey2 = _defaultImport39.$getNodeByKey;
 var LexicalTablePlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */_defineComponent14({
   __name: "LexicalTablePlugin",
   props: {
@@ -2136,7 +2137,7 @@ var LexicalTablePlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE_
   },
   setup(__props) {
     const props = __props;
-    const editor = useEditor();
+    const editor = useLexicalComposer();
     function $insertFirst(parent, node) {
       const firstChild = parent.getFirstChild();
       if (firstChild !== null) firstChild.insertBefore(node);else parent.append(node);
@@ -2198,17 +2199,17 @@ var LexicalTablePlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE_
       if (props.hasCellMerge) return;
       return editor.registerNodeTransform(TableCellNode, node => {
         if (node.getColSpan() > 1 || node.getRowSpan() > 1) {
-          const [,, gridNode] = DEPRECATED_$getNodeTriplet(node);
-          const [gridMap] = DEPRECATED_$computeGridMap(gridNode, node, node);
+          const [,, gridNode] = $getNodeTriplet(node);
+          const [gridMap] = $computeTableMap(gridNode, node, node);
           const rowsCount = gridMap.length;
           const columnsCount = gridMap[0].length;
           let row = gridNode.getFirstChild();
-          if (!DEPRECATED_$isGridRowNode(row)) throw new Error("Expected TableNode first child to be a RowNode");
+          if (!$isTableRowNode(row)) throw new Error("Expected TableNode first child to be a RowNode");
           const unmerged = [];
           for (let i = 0; i < rowsCount; i++) {
             if (i !== 0) {
               row = row.getNextSibling();
-              if (!DEPRECATED_$isGridRowNode(row)) throw new Error("Expected TableNode first child to be a RowNode");
+              if (!$isTableRowNode(row)) throw new Error("Expected TableNode first child to be a RowNode");
             }
             let lastRowCell = null;
             for (let j = 0; j < columnsCount; j++) {
@@ -2220,9 +2221,7 @@ var LexicalTablePlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE_
               } else if (cell.getColSpan() > 1 || cell.getRowSpan() > 1) {
                 if (!$isTableCellNode(cell)) throw new Error("Expected TableNode cell to be a TableCellNode");
                 const newCell = $createTableCellNode(cell.__headerState);
-                if (lastRowCell !== null) lastRowCell.insertAfter(newCell);else {
-                  $insertFirst(row, newCell);
-                }
+                if (lastRowCell !== null) lastRowCell.insertAfter(newCell);else $insertFirst(row, newCell);
               }
             }
           }
@@ -2250,7 +2249,7 @@ var LexicalTablePlugin_default = /* @__PURE__ */export_helper_default(LexicalTab
 
 // unplugin-vue:/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalClearEditorPlugin.vue?vue&type=script&setup=true&lang.ts
 import { defineComponent as _defineComponent15 } from "vue";
-import _defaultImport40 from "lexical";
+import * as _defaultImport40 from "lexical";
 const COMMAND_PRIORITY_EDITOR4 = _defaultImport40.COMMAND_PRIORITY_EDITOR;
 const CLEAR_EDITOR_COMMAND = _defaultImport40.CLEAR_EDITOR_COMMAND;
 const $getSelection8 = _defaultImport40.$getSelection;
@@ -2263,7 +2262,7 @@ var LexicalClearEditorPlugin_vue_vue_type_script_setup_true_lang_default = /* @_
   setup(__props, {
     emit
   }) {
-    const editor = useEditor();
+    const editor = useLexicalComposer();
     const attrs = useAttrs();
     useMounted(() => {
       const emitExists = Boolean(attrs.onClear);
@@ -2308,7 +2307,7 @@ var LexicalCharacterLimitPlugin_vue_vue_type_script_setup_true_lang_default = /*
   },
   setup(__props) {
     const props = __props;
-    const editor = useEditor();
+    const editor = useLexicalComposer();
     let textEncoderInstance = null;
     function textEncoder() {
       if (window.TextEncoder === void 0) return null;
@@ -2348,7 +2347,7 @@ var LexicalCharacterLimitPlugin_default = /* @__PURE__ */export_helper_default(L
 
 // unplugin-vue:/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalAutoScrollPlugin.vue?vue&type=script&setup=true&lang.ts
 import { defineComponent as _defineComponent17 } from "vue";
-import _defaultImport41 from "lexical";
+import * as _defaultImport41 from "lexical";
 const $isRangeSelection5 = _defaultImport41.$isRangeSelection;
 const $getSelection9 = _defaultImport41.$getSelection;
 var LexicalAutoScrollPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */_defineComponent17({
@@ -2361,7 +2360,7 @@ var LexicalAutoScrollPlugin_vue_vue_type_script_setup_true_lang_default = /* @__
   },
   setup(__props) {
     const props = __props;
-    const editor = useEditor();
+    const editor = useLexicalComposer();
     useMounted(() => {
       return editor.registerUpdateListener(({
         tags,
@@ -2387,7 +2386,7 @@ var LexicalAutoScrollPlugin_default = /* @__PURE__ */export_helper_default(Lexic
 
 // unplugin-vue:/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalHashtagPlugin.vue?vue&type=script&setup=true&lang.ts
 import { defineComponent as _defineComponent18 } from "vue";
-import _defaultImport42 from "@lexical/hashtag";
+import * as _defaultImport42 from "@lexical/hashtag";
 const HashtagNode = _defaultImport42.HashtagNode;
 const $createHashtagNode = _defaultImport42.$createHashtagNode;
 import { onMounted as onMounted4 } from "vue";
@@ -2430,7 +2429,7 @@ var LexicalHashtagPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PUR
       return hashtag;
     }
     const REGEX = new RegExp(getHashtagRegexString(), "i");
-    const editor = useEditor();
+    const editor = useLexicalComposer();
     onMounted4(() => {
       if (!editor.hasNodes([HashtagNode])) throw new Error("HashtagPlugin: HashtagNode not registered on editor");
     });
@@ -2459,7 +2458,7 @@ var LexicalHashtagPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PUR
 var LexicalHashtagPlugin_default = /* @__PURE__ */export_helper_default(LexicalHashtagPlugin_vue_vue_type_script_setup_true_lang_default, [["__file", "/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalHashtagPlugin.vue"]]);
 
 // src/components/LexicalDecoratorBlockNode.ts
-import _defaultImport43 from "lexical";
+import * as _defaultImport43 from "lexical";
 const DecoratorNode = _defaultImport43.DecoratorNode;
 var DecoratorBlockNode = class extends DecoratorNode {
   __format;
@@ -2495,10 +2494,10 @@ function $isDecoratorBlockNode(node) {
 // unplugin-vue:/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalBlockWithAlignableContents.vue?vue&type=script&setup=true&lang.ts
 import { defineComponent as _defineComponent19 } from "vue";
 import { unref as _unref4, renderSlot as _renderSlot6, normalizeClass as _normalizeClass3, normalizeStyle as _normalizeStyle, openBlock as _openBlock7, createElementBlock as _createElementBlock6 } from "vue";
-import _defaultImport44 from "@lexical/utils";
+import * as _defaultImport44 from "@lexical/utils";
 const mergeRegister10 = _defaultImport44.mergeRegister;
 const $getNearestBlockElementAncestorOrThrow = _defaultImport44.$getNearestBlockElementAncestorOrThrow;
-import _defaultImport45 from "lexical";
+import * as _defaultImport45 from "lexical";
 const KEY_DELETE_COMMAND = _defaultImport45.KEY_DELETE_COMMAND;
 const KEY_BACKSPACE_COMMAND = _defaultImport45.KEY_BACKSPACE_COMMAND;
 const FORMAT_ELEMENT_COMMAND = _defaultImport45.FORMAT_ELEMENT_COMMAND;
@@ -2524,7 +2523,7 @@ var LexicalBlockWithAlignableContents_vue_vue_type_script_setup_true_lang_defaul
   },
   setup(__props) {
     const props = __props;
-    const editor = useEditor();
+    const editor = useLexicalComposer();
     const {
       isSelected,
       setSelected,
@@ -2590,7 +2589,7 @@ var LexicalBlockWithAlignableContents_default = /* @__PURE__ */export_helper_def
 
 // unplugin-vue:/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalCheckListPlugin.vue?vue&type=script&setup=true&lang.ts
 import { defineComponent as _defineComponent20 } from "vue";
-import _defaultImport46 from "lexical";
+import * as _defaultImport46 from "lexical";
 const KEY_SPACE_COMMAND = _defaultImport46.KEY_SPACE_COMMAND;
 const KEY_ESCAPE_COMMAND2 = _defaultImport46.KEY_ESCAPE_COMMAND;
 const KEY_ARROW_UP_COMMAND2 = _defaultImport46.KEY_ARROW_UP_COMMAND;
@@ -2601,12 +2600,12 @@ const $isRangeSelection7 = _defaultImport46.$isRangeSelection;
 const $isElementNode3 = _defaultImport46.$isElementNode;
 const $getSelection11 = _defaultImport46.$getSelection;
 const $getNearestNodeFromDOMNode = _defaultImport46.$getNearestNodeFromDOMNode;
-import _defaultImport47 from "@lexical/list";
+import * as _defaultImport47 from "@lexical/list";
 const insertList2 = _defaultImport47.insertList;
 const INSERT_CHECK_LIST_COMMAND = _defaultImport47.INSERT_CHECK_LIST_COMMAND;
 const $isListNode = _defaultImport47.$isListNode;
 const $isListItemNode = _defaultImport47.$isListItemNode;
-import _defaultImport48 from "@lexical/utils";
+import * as _defaultImport48 from "@lexical/utils";
 // src/composables/listenerManager.ts
 const mergeRegister11 = _defaultImport48.mergeRegister;
 const $findMatchingParent = _defaultImport48.$findMatchingParent;
@@ -2629,7 +2628,7 @@ function registerClickAndPointerListeners(register, unregister) {
 var LexicalCheckListPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */_defineComponent20({
   __name: "LexicalCheckListPlugin",
   setup(__props) {
-    const editor = useEditor();
+    const editor = useLexicalComposer();
     useMounted(() => {
       return mergeRegister11(editor.registerCommand(INSERT_CHECK_LIST_COMMAND, () => {
         insertList2(editor, "check");
@@ -2789,7 +2788,7 @@ var LexicalCheckListPlugin_default = /* @__PURE__ */export_helper_default(Lexica
 
 // unplugin-vue:/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalMarkdownShortcutPlugin.vue?vue&type=script&setup=true&lang.ts
 import { defineComponent as _defineComponent21 } from "vue";
-import _defaultImport49 from "@lexical/markdown";
+import * as _defaultImport49 from "@lexical/markdown";
 const registerMarkdownShortcuts = _defaultImport49.registerMarkdownShortcuts;
 const TRANSFORMERS = _defaultImport49.TRANSFORMERS;
 var LexicalMarkdownShortcutPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */_defineComponent21({
@@ -2803,7 +2802,7 @@ var LexicalMarkdownShortcutPlugin_vue_vue_type_script_setup_true_lang_default = 
   },
   setup(__props) {
     const props = __props;
-    const editor = useEditor();
+    const editor = useLexicalComposer();
     useMounted(() => {
       return registerMarkdownShortcuts(editor, props.transformers);
     });
@@ -2818,7 +2817,7 @@ var LexicalMarkdownShortcutPlugin_default = /* @__PURE__ */export_helper_default
 
 // unplugin-vue:/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalTabIndentationPlugin.vue?vue&type=script&setup=true&lang.ts
 import { defineComponent as _defineComponent22 } from "vue";
-import _defaultImport50 from "lexical";
+import * as _defaultImport50 from "lexical";
 const OUTDENT_CONTENT_COMMAND = _defaultImport50.OUTDENT_CONTENT_COMMAND;
 const KEY_TAB_COMMAND2 = _defaultImport50.KEY_TAB_COMMAND;
 const INDENT_CONTENT_COMMAND = _defaultImport50.INDENT_CONTENT_COMMAND;
@@ -2828,7 +2827,7 @@ const $getSelection12 = _defaultImport50.$getSelection;
 var LexicalTabIndentationPlugin_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */_defineComponent22({
   __name: "LexicalTabIndentationPlugin",
   setup(__props) {
-    const editor = useEditor();
+    const editor = useLexicalComposer();
     useMounted(() => {
       return editor.registerCommand(KEY_TAB_COMMAND2, event => {
         const selection = $getSelection12();
@@ -2910,7 +2909,7 @@ var LexicalCollaborationPlugin_vue_vue_type_script_setup_true_lang_default = /* 
       if (props.username !== void 0) useCollaborationContext_default.value.name = props.username;
       if (props.cursorColor !== void 0) useCollaborationContext_default.value.color = props.cursorColor;
     });
-    const editor = useEditor();
+    const editor = useLexicalComposer();
     useEffect(() => {
       useCollaborationContext_default.value.isCollabActive = true;
       return () => {
@@ -2937,7 +2936,7 @@ var LexicalCollaborationPlugin_vue_vue_type_script_setup_true_lang_default = /* 
 
 // src/components/LexicalCollaborationPlugin.vue
 var LexicalCollaborationPlugin_default = /* @__PURE__ */export_helper_default(LexicalCollaborationPlugin_vue_vue_type_script_setup_true_lang_default, [["__file", "/Users/wing/ParacraftDevelop/lexical-vue/src/components/LexicalCollaborationPlugin.vue"]]);
-export { $createDecoratorBlockNode, $isDecoratorBlockNode, DecoratorBlockNode, LexicalAutoFocusPlugin_default as LexicalAutoFocusPlugin, LexicalAutoLinkPlugin_default as LexicalAutoLinkPlugin, LexicalAutoScrollPlugin_default as LexicalAutoScrollPlugin, LexicalBlockWithAlignableContents_default as LexicalBlockWithAlignableContents, LexicalCharacterLimitPlugin_default as LexicalCharacterLimitPlugin, LexicalCheckListPlugin_default as LexicalCheckListPlugin, LexicalClearEditorPlugin_default as LexicalClearEditorPlugin, LexicalCollaborationPlugin_default as LexicalCollaborationPlugin, LexicalComposer_default as LexicalComposer, LexicalContentEditable_default as LexicalContentEditable, LexicalDecoratedTeleports_default as LexicalDecoratedTeleports, LexicalHashtagPlugin_default as LexicalHashtagPlugin, LexicalHistoryPlugin_default as LexicalHistoryPlugin, LexicalLinkPlugin_default as LexicalLinkPlugin, LexicalListPlugin_default as LexicalListPlugin, LexicalMarkdownShortcutPlugin_default as LexicalMarkdownShortcutPlugin, LexicalOnChangePlugin_default as LexicalOnChangePlugin, LexicalPlainTextPlugin_default as LexicalPlainTextPlugin, LexicalPopoverMenu_default as LexicalPopoverMenu, LexicalRichTextPlugin_default as LexicalRichTextPlugin, LexicalTabIndentationPlugin_default as LexicalTabIndentationPlugin, LexicalTablePlugin_default as LexicalTablePlugin, LexicalTreeViewPlugin_default as LexicalTreeViewPlugin, LexicalTypeaheadMenuPlugin_default as LexicalTypeaheadMenuPlugin, PUNCTUATION, TypeaheadOption, mergePrevious, useAutoLink, useBasicTypeaheadTriggerMatch, useCanShowPlaceholder, useCharacterLimit, useDecorators, useDynamicPositioning, useEditor, useEffect, useHistory, useLexicalIsTextContentEmpty, useLexicalNodeSelection, useLexicalTextEntity, useLexicalTypeaheadMenuPlugin, useList, useMenuAnchorRef, useMounted, usePlainTextSetup, useRichTextSetup, useYjsCollaboration, useYjsFocusTracking, useYjsHistory };
+export { $createDecoratorBlockNode, $isDecoratorBlockNode, DecoratorBlockNode, LexicalAutoFocusPlugin_default as LexicalAutoFocusPlugin, LexicalAutoLinkPlugin_default as LexicalAutoLinkPlugin, LexicalAutoScrollPlugin_default as LexicalAutoScrollPlugin, LexicalBlockWithAlignableContents_default as LexicalBlockWithAlignableContents, LexicalCharacterLimitPlugin_default as LexicalCharacterLimitPlugin, LexicalCheckListPlugin_default as LexicalCheckListPlugin, LexicalClearEditorPlugin_default as LexicalClearEditorPlugin, LexicalCollaborationPlugin_default as LexicalCollaborationPlugin, LexicalComposer_default as LexicalComposer, LexicalContentEditable_default as LexicalContentEditable, LexicalDecoratedTeleports_default as LexicalDecoratedTeleports, LexicalHashtagPlugin_default as LexicalHashtagPlugin, LexicalHistoryPlugin_default as LexicalHistoryPlugin, LexicalLinkPlugin_default as LexicalLinkPlugin, LexicalListPlugin_default as LexicalListPlugin, LexicalMarkdownShortcutPlugin_default as LexicalMarkdownShortcutPlugin, LexicalOnChangePlugin_default as LexicalOnChangePlugin, LexicalPlainTextPlugin_default as LexicalPlainTextPlugin, LexicalPopoverMenu_default as LexicalPopoverMenu, LexicalRichTextPlugin_default as LexicalRichTextPlugin, LexicalTabIndentationPlugin_default as LexicalTabIndentationPlugin, LexicalTablePlugin_default as LexicalTablePlugin, LexicalTreeViewPlugin_default as LexicalTreeViewPlugin, LexicalTypeaheadMenuPlugin_default as LexicalTypeaheadMenuPlugin, PUNCTUATION, TypeaheadOption, mergePrevious, useAutoLink, useBasicTypeaheadTriggerMatch, useCanShowPlaceholder, useCharacterLimit, useDecorators, useDynamicPositioning, useEffect, useHistory, useLexicalComposer, useLexicalIsTextContentEmpty, useLexicalNodeSelection, useLexicalTextEntity, useLexicalTypeaheadMenuPlugin, useList, useMenuAnchorRef, useMounted, usePlainTextSetup, useRichTextSetup, useYjsCollaboration, useYjsFocusTracking, useYjsHistory };
 /*!
  * Original code by Meta Platforms
  * MIT Licensed, Copyright (c) Meta Platforms, Inc. and affiliates, see https://github.com/facebook/lexical/blob/main/LICENSE for details
