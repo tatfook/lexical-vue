@@ -3,7 +3,6 @@ import type {
   BaseSelection,
   EditorState,
   ElementNode,
-  INTERNAL_PointSelection,
   LexicalNode, RangeSelection,
   TextNode,
 } from 'lexical'
@@ -19,9 +18,9 @@ import {
 import { computed, onUnmounted, ref, watchEffect } from 'vue'
 import type { LinkNode } from '@lexical/link'
 import { $isLinkNode } from '@lexical/link'
-import type { GridSelection } from '@lexical/table'
-import { $isGridSelection } from '@lexical/table'
-import { useEditor } from '../composables'
+import type { TableSelection } from '@lexical/table'
+import { $isTableSelection } from '@lexical/table'
+import { useLexicalComposer } from '../composables'
 
 defineProps<{
   timeTravelButtonClassName: string
@@ -76,8 +75,8 @@ function printNodeSelection(selection: BaseSelection): string {
   return `: node\n  └ [${Array.from(selection._nodes).join(', ')}]`
 }
 
-function printGridSelection(selection: GridSelection): string {
-  return `: grid\n  └ { grid: ${selection.gridKey}, anchorCell: ${selection.anchor.key}, focusCell: ${selection.focus.key} }`
+function printTableSelection(selection: TableSelection): string {
+  return `: table\n  └ { table: ${selection.tableKey}, anchorCell: ${selection.anchor.key}, focusCell: ${selection.focus.key} }`
 }
 
 function generateContent(editorState: EditorState): string {
@@ -113,8 +112,8 @@ function generateContent(editorState: EditorState): string {
       ? ': null'
       : $isRangeSelection(selection)
         ? printRangeSelection(selection)
-        : $isGridSelection(selection)
-          ? printGridSelection(selection)
+        : $isTableSelection(selection)
+          ? printTableSelection(selection)
           : printNodeSelection(selection)
   })
 
@@ -347,10 +346,13 @@ function printSelectedCharsLine({
 
 function $getSelectionStartEnd(
   node: LexicalNode,
-  selection: INTERNAL_PointSelection,
+  selection: BaseSelection,
 ): [number, number] {
-  const anchor = selection.anchor
-  const focus = selection.focus
+  const anchorAndFocus = selection.getStartEndPoints()
+  if ($isNodeSelection(selection) || anchorAndFocus === null)
+    return [-1, -1]
+
+  const [anchor, focus] = anchorAndFocus
   const textContent = node.getTextContent()
   const textLength = textContent.length
 
@@ -364,11 +366,11 @@ function $getSelectionStartEnd(
 
     if (
       anchorNode === focusNode
-      && node === anchorNode
-      && anchor.offset !== focus.offset
+        && node === anchorNode
+        && anchor.offset !== focus.offset
     ) {
       [start, end]
-        = anchor.offset < focus.offset
+          = anchor.offset < focus.offset
           ? [anchor.offset, focus.offset]
           : [focus.offset, anchor.offset]
     }
@@ -399,12 +401,12 @@ function $getSelectionStartEnd(
   return [
     start + numNonSingleWidthCharBeforeSelection,
     end
-      + numNonSingleWidthCharBeforeSelection
-      + numNonSingleWidthCharInSelection,
+    + numNonSingleWidthCharBeforeSelection
+    + numNonSingleWidthCharInSelection,
   ]
 }
 
-const editor = useEditor()
+const editor = useLexicalComposer()
 
 const timeStampedEditorStates = ref<[number, EditorState][]>([])
 const content = ref('')

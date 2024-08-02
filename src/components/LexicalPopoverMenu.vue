@@ -14,7 +14,7 @@ import {
 } from 'lexical'
 import { computed, ref, watch, watchPostEffect } from 'vue'
 import type { QueryMatch, Resolution, TypeaheadOption } from '../composables'
-import { useEditor, useEffect, useMounted } from '../composables'
+import { useLexicalComposer, useEffect, useMounted } from '../composables'
 
 const props = defineProps<{
   anchorElementRef: HTMLElement
@@ -37,7 +37,7 @@ const SCROLL_TYPEAHEAD_OPTION_INTO_VIEW_COMMAND: LexicalCommand<{
   option: TypeaheadOption
 }> = createCommand('SCROLL_TYPEAHEAD_OPTION_INTO_VIEW_COMMAND')
 
-const editor = useEditor()
+const editor = useLexicalComposer()
 
 const selectedIndex = ref<null | number>(null)
 

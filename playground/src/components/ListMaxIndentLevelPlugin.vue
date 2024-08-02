@@ -8,7 +8,7 @@ import {
   $isRangeSelection,
   INDENT_CONTENT_COMMAND,
 } from 'lexical'
-import { useEditor } from 'lexical-vue'
+import { useLexicalComposer } from 'lexical-vue'
 import { onMounted, onUnmounted } from 'vue'
 
 const props = withDefaults(defineProps<{
@@ -63,7 +63,7 @@ function isIndentPermitted(maxDepth: number) {
   return totalDepth <= maxDepth
 }
 
-const editor = useEditor()
+const editor = useLexicalComposer()
 let unregisterListener: () => void
 
 onMounted(() => {

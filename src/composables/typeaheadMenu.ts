@@ -2,7 +2,7 @@ import type { LexicalEditor } from 'lexical'
 import type { Ref } from 'vue'
 import { ref, unref } from 'vue'
 import type { MaybeRef } from '../types'
-import { useEditor } from './useEditor'
+import { useLexicalComposer } from './useLexicalComposer'
 import { useEffect } from './useEffect'
 
 export type TriggerFn = (
@@ -69,7 +69,7 @@ export function useMenuAnchorRef(
   setResolution: (r: Resolution | null) => void,
   className?: string,
 ): Ref<HTMLElement> {
-  const editor = useEditor()
+  const editor = useLexicalComposer()
   const anchorElementRef = ref<HTMLElement>(document.createElement('div'))
   const positionMenu = () => {
     const rootElement = editor.getRootElement()
@@ -188,7 +188,7 @@ export function useDynamicPositioning(
   onReposition: () => void,
   onVisibilityChange?: (isInView: boolean) => void,
 ) {
-  const editor = useEditor()
+  const editor = useLexicalComposer()
   useEffect(() => {
     if (unref(targetElement) !== null && unref(resolution) !== null) {
       const rootElement = editor.getRootElement()

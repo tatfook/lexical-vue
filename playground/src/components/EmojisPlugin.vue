@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { useEditor } from 'lexical-vue'
+import { useLexicalComposer } from 'lexical-vue'
 import useEmojis from '../composables/useEmojis'
 
-const editor = useEditor()
+const editor = useLexicalComposer()
 
 useEmojis(editor)
 </script>

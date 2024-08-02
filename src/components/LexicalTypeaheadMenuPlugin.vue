@@ -3,7 +3,7 @@ import type { LexicalEditor, RangeSelection, TextNode } from 'lexical'
 import { $getSelection, $isRangeSelection, $isTextNode } from 'lexical'
 import { ref } from 'vue'
 import type { Resolution, TriggerFn, TypeaheadOption } from '../composables'
-import { useEditor, useEffect, useMenuAnchorRef } from '../composables'
+import { useLexicalComposer, useEffect, useMenuAnchorRef } from '../composables'
 import LexicalPopoverMenu from './LexicalPopoverMenu.vue'
 
 const props = defineProps<{
@@ -22,7 +22,7 @@ const emit = defineEmits<{
     matchingString: string
   }): void
 }>()
-const editor = useEditor()
+const editor = useLexicalComposer()
 const resolution = ref<Resolution | null>(null)
 
 function setResolution(value: Resolution | null) {

@@ -7,10 +7,10 @@ import {
 import {
   COMMAND_PRIORITY_EDITOR,
 } from 'lexical'
-import { useEditor } from '../composables'
+import { useLexicalComposer } from '../composables'
 import { useMounted } from '../composables/useMounted'
 
-const editor = useEditor()
+const editor = useLexicalComposer()
 
 useMounted(() => {
   if (!editor.hasNodes([LinkNode]))

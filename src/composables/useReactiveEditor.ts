@@ -1,7 +1,9 @@
+import type { ShallowRef } from 'vue'
 import { inject, onUnmounted, shallowRef, triggerRef } from 'vue'
+import type { LexicalEditor } from 'lexical'
 import { editorKey } from './inject'
 
-export function useReactiveEditor() {
+export function useReactiveEditor(): ShallowRef<LexicalEditor> {
   const editor = inject(editorKey)
 
   if (!editor)

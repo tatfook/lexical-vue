@@ -4,7 +4,7 @@ import { $isLinkNode, TOGGLE_LINK_COMMAND } from '@lexical/link'
 import { mergeRegister } from '@lexical/utils'
 import type { CommandListenerPriority, LexicalNode, NodeSelection, RangeSelection } from 'lexical'
 import { $getSelection, $isRangeSelection, SELECTION_CHANGE_COMMAND } from 'lexical'
-import { useEditor } from 'lexical-vue'
+import { useLexicalComposer } from 'lexical-vue'
 import { onMounted, onUnmounted, ref, watchEffect } from 'vue'
 import { getSelectedNode } from '../utils'
 import {TableSelection} from "@lexical/table";
@@ -19,7 +19,7 @@ const linkUrl = ref('')
 const isEditMode = ref(false)
 const lastSelection = ref<RangeSelection | NodeSelection | TableSelection | null>(null)
 
-const editor = useEditor()
+const editor = useLexicalComposer()
 
 function positionEditorElement(editor: HTMLDivElement, rect: DOMRect | null) {
   if (!rect) {

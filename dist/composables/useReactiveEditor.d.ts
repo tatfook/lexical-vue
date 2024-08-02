@@ -1,1 +1,3 @@
-export declare function useReactiveEditor(): import("vue").ShallowRef<import("lexical").LexicalEditor>;
+import type { ShallowRef } from 'vue';
+import type { LexicalEditor } from 'lexical';
+export declare function useReactiveEditor(): ShallowRef<LexicalEditor>;
